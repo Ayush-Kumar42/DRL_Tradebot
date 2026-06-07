@@ -25,22 +25,42 @@ import copy
 # ─────────────────────────────────────────────────────────────────────────────
 
 SYM = "TEST"
+TRAIL = 0.05 
 
-
-def make_bl(open_price: float = 100.0, balance: float = 100_000.0) -> BusinessLogic:
-    """Minimal BusinessLogic with a one-row DataFrame."""
-    df = pd.DataFrame({"Open": [open_price]})
-    return BusinessLogic(
+def make_bl(
+    open_price: float = 100.0,
+    close_price: float | None = None,
+    balance: float = 100_000.0,
+    trail_pct: float = TRAIL,
+) -> BusinessLogic:
+    """
+    Minimal BusinessLogic with a single-row DataFrame.
+    `close_price` defaults to `open_price` when not supplied so tests that
+    only need check_trailing_stops don't have to specify it.
+    """
+    if close_price is None:
+        close_price = open_price
+    df = pd.DataFrame({"Open": [open_price], "Close": [close_price]})
+    bl = BusinessLogic(
         df=df,
         balance=balance,
         current_step=0,
         T_indicators=[],
         MR_indicators=[],
     )
+    bl.trail_pct = trail_pct
+    return bl
 
 
-def pos(order: int, price: float, volume: int, signal: int, symbol: str = SYM) -> Position:
+def pos(
+    order: int,
+    price: float,
+    volume: int,
+    signal: int,
+    symbol: str = SYM,
+) -> Position:
     return Position(order=order, price=price, volume=volume, signal=signal, symbol=symbol)
+
 
 
 def total_volume(positions: list[Position]) -> int:
@@ -774,3 +794,470 @@ class TestExecuteTradeRouting:
         other = [p for p in remaining if p.symbol == "OTHER"]
         assert len(other) == 1
         assert other[0].volume == 20
+class TestCheckTrailingStops:
+    """
+    Stop formulas (trail_pct = 0.05 throughout unless overridden):
+ 
+    Long  (signal=+1): stop = entry * (1 - 0.05) = entry * 0.95
+        triggered when price <= stop   (i.e. price ≤ entry * 0.95)
+ 
+    Short (signal=-1): stop = entry * (1 + 0.05) = entry * 1.05
+        triggered when price >= stop   (i.e. price ≥ entry * 1.05)
+    """
+ 
+    # ── Long: stop not triggered ───────────────────────────────────────────
+ 
+    def test_long_safe_price_position_survives(self):
+        """
+        entry=100 → stop=95.  price=96 > stop → not triggered.
+        Position must remain in the returned list unchanged.
+        """
+        bl = make_bl(open_price=96.0)
+        p = pos(1, 100.0, 10, signal=1)
+        pnl, remaining = bl.check_trailing_stops([p], price=96.0)
+ 
+        assert pnl == pytest.approx(0.0, abs=1e-6)
+        assert len(remaining) == 1
+        assert remaining[0] is p
+ 
+    def test_long_price_just_above_stop_survives(self):
+        """
+        entry=100 → stop=95.  price=95.01 > 95 → not triggered.
+        """
+        bl = make_bl()
+        p = pos(1, 100.0, 10, signal=1)
+        pnl, remaining = bl.check_trailing_stops([p], price=95.01)
+ 
+        assert pnl == pytest.approx(0.0, abs=1e-6)
+        assert len(remaining) == 1
+ 
+    # ── Long: stop triggered ──────────────────────────────────────────────
+ 
+    def test_long_stop_triggered_at_exact_boundary(self):
+        """
+        entry=100 → stop=95.  price=95 == stop → triggered (price <= stop).
+        PnL = 10 * (95 - 100) * 1 = -50.
+        """
+        bl = make_bl(open_price=95.0)
+        p = pos(1, 100.0, 10, signal=1)
+        pnl, remaining = bl.check_trailing_stops([p], price=95.0)
+ 
+        assert pnl == pytest.approx(-50.0, abs=1e-6)
+        assert remaining == []
+ 
+    def test_long_stop_triggered_below_boundary(self):
+        """
+        entry=100 → stop=95.  price=90 < stop → triggered.
+        PnL = 10 * (90 - 100) * 1 = -100.
+        """
+        bl = make_bl()
+        p = pos(1, 100.0, 10, signal=1)
+        pnl, remaining = bl.check_trailing_stops([p], price=90.0)
+ 
+        assert pnl == pytest.approx(-100.0, abs=1e-6)
+        assert remaining == []
+ 
+    def test_long_profitable_stop_triggered(self):
+        """
+        entry=80 → stop=76.  price=76 == stop → triggered.
+        PnL = 5 * (76 - 80) * 1 = -20  (still a loss since close < entry).
+ 
+        Note: with entry-anchored stops there is no "trailing" upward; the
+        stop is always entry * 0.95, so even a profitable position can be
+        stopped out at a loss if price retraces below that level.
+        """
+        bl = make_bl()
+        p = pos(1, 80.0, 5, signal=1)
+        pnl, remaining = bl.check_trailing_stops([p], price=76.0)
+ 
+        assert pnl == pytest.approx(5 * (76.0 - 80.0), abs=1e-6)   # = -20
+        assert remaining == []
+ 
+    # ── Short: stop not triggered ──────────────────────────────────────────
+ 
+    def test_short_safe_price_position_survives(self):
+        """
+        entry=100 → stop=105.  price=104 < stop → not triggered.
+        """
+        bl = make_bl()
+        p = pos(1, 100.0, 10, signal=-1)
+        pnl, remaining = bl.check_trailing_stops([p], price=104.0)
+ 
+        assert pnl == pytest.approx(0.0, abs=1e-6)
+        assert len(remaining) == 1
+        assert remaining[0] is p
+ 
+    def test_short_price_just_below_stop_survives(self):
+        """
+        entry=100 → stop=105.  price=104.99 < 105 → not triggered.
+        """
+        bl = make_bl()
+        p = pos(1, 100.0, 10, signal=-1)
+        pnl, remaining = bl.check_trailing_stops([p], price=104.99)
+ 
+        assert pnl == pytest.approx(0.0, abs=1e-6)
+        assert len(remaining) == 1
+ 
+    # ── Short: stop triggered ─────────────────────────────────────────────
+ 
+    def test_short_stop_triggered_at_exact_boundary(self):
+        """
+        entry=100 → stop=105.  price=105 == stop → triggered (price >= stop).
+        PnL = 10 * (105 - 100) * -1 = -50.
+        """
+        bl = make_bl()
+        p = pos(1, 100.0, 10, signal=-1)
+        pnl, remaining = bl.check_trailing_stops([p], price=105.0)
+ 
+        assert pnl == pytest.approx(-50.0, abs=1e-6)
+        assert remaining == []
+ 
+    def test_short_stop_triggered_above_boundary(self):
+        """
+        entry=100 → stop=105.  price=110 > stop → triggered.
+        PnL = 10 * (110 - 100) * -1 = -100.
+        """
+        bl = make_bl()
+        p = pos(1, 100.0, 10, signal=-1)
+        pnl, remaining = bl.check_trailing_stops([p], price=110.0)
+ 
+        assert pnl == pytest.approx(-100.0, abs=1e-6)
+        assert remaining == []
+ 
+    def test_short_profitable_stop_triggered(self):
+        """
+        entry=120 → stop=126.  price=126 → triggered.
+        PnL = 8 * (126 - 120) * -1 = -48.
+        """
+        bl = make_bl()
+        p = pos(1, 120.0, 8, signal=-1)
+        pnl, remaining = bl.check_trailing_stops([p], price=126.0)
+ 
+        assert pnl == pytest.approx(8 * (126.0 - 120.0) * -1, abs=1e-6)   # = -48
+        assert remaining == []
+ 
+    # ── Mixed portfolio ───────────────────────────────────────────────────
+ 
+    def test_mixed_only_triggered_positions_removed(self):
+        """
+        Three positions; only the middle one's stop is hit.
+ 
+        p1: long,  entry=100, stop=95.   price=189 > 95   → SAFE
+        p2: long,  entry=200, stop=190.  price=189 < 190  → TRIGGERED  PnL=5*(189-200)*1=-55
+        p3: short, entry=210, stop=220.5 (210*1.05).
+                                         price=189 < 220.5 → SAFE
+ 
+        Choosing entry=210 for the short so its stop=220.5 sits above the
+        test price of 189, keeping it safely open.
+        """
+        bl = make_bl()
+        p1 = pos(1, 100.0,  10, signal=1)
+        p2 = pos(2, 200.0,   5, signal=1)
+        p3 = pos(3, 210.0,  10, signal=-1)
+ 
+        pnl, remaining = bl.check_trailing_stops([p1, p2, p3], price=189.0)
+ 
+        assert pnl == pytest.approx(5 * (189.0 - 200.0) * 1, abs=1e-6)   # = -55
+        assert len(remaining) == 2
+        remaining_orders = {p.order for p in remaining}
+        assert 1 in remaining_orders
+        assert 3 in remaining_orders
+        assert 2 not in remaining_orders
+ 
+    def test_multiple_stops_triggered_pnl_accumulates(self):
+        """
+        Two positions both stopped out; PnL is the sum of both.
+ 
+        p1: long,  entry=100, stop=95.  price=94 → TRIGGERED  PnL=10*(94-100)=-60
+        p2: short, entry=100, stop=105. price=106 → TRIGGERED  PnL=10*(106-100)*-1=-60
+        Total expected PnL = -120.
+        """
+        bl = make_bl()
+        p1 = pos(1, 100.0, 10, signal=1)
+        p2 = pos(2, 100.0, 10, signal=-1)
+ 
+        pnl, remaining = bl.check_trailing_stops([p1, p2], price=106.0)
+ 
+        # p1 long: stop=95, price=106 > 95 → NOT triggered
+        # p2 short: stop=105, price=106 >= 105 → triggered
+        # Only p2 fires; p1 stays.
+        assert len(remaining) == 1
+        assert remaining[0].order == 1
+        assert pnl == pytest.approx(10 * (106.0 - 100.0) * -1, abs=1e-6)   # = -60
+ 
+    def test_all_positions_stopped_out(self):
+        """
+        All positions in the list are stopped out → empty remaining, combined PnL.
+ 
+        p1: long,  entry=100, stop=95.  price=90 → triggered  PnL=10*(90-100)=-100
+        p2: long,  entry=200, stop=190. price=90 → triggered  PnL=5*(90-200)=-550
+        Total = -650.
+        """
+        bl = make_bl()
+        p1 = pos(1, 100.0, 10, signal=1)
+        p2 = pos(2, 200.0,  5, signal=1)
+ 
+        pnl, remaining = bl.check_trailing_stops([p1, p2], price=90.0)
+ 
+        expected = 10 * (90 - 100) + 5 * (90 - 200)
+        assert pnl == pytest.approx(expected, abs=1e-6)   # = -650
+        assert remaining == []
+ 
+    def test_empty_positions_returns_zero_and_empty(self):
+        """No positions → pnl=0, remaining=[]."""
+        bl = make_bl()
+        pnl, remaining = bl.check_trailing_stops([], price=100.0)
+ 
+        assert pnl == pytest.approx(0.0, abs=1e-6)
+        assert remaining == []
+ 
+    # ── trail_pct sensitivity ─────────────────────────────────────────────
+ 
+    def test_custom_trail_pct_tighter_stop(self):
+        """
+        trail_pct=0.01 → stop=99 for entry=100.
+        price=99 → triggered.  price=99.5 → safe.
+        """
+        bl = make_bl(trail_pct=0.01)
+        p_triggered = pos(1, 100.0, 10, signal=1)
+        p_safe      = pos(2, 100.0, 10, signal=1)
+ 
+        _, remaining_tight = bl.check_trailing_stops([p_triggered], price=99.0)
+        assert remaining_tight == []     # triggered
+ 
+        _, remaining_safe = bl.check_trailing_stops([p_safe], price=99.5)
+        assert len(remaining_safe) == 1  # safe
+ 
+    def test_custom_trail_pct_wider_stop(self):
+        """
+        trail_pct=0.20 → stop=80 for entry=100.
+        price=85 > 80 → NOT triggered.
+        price=80 → triggered.
+        """
+        bl = make_bl(trail_pct=0.20)
+        p = pos(1, 100.0, 10, signal=1)
+ 
+        _, remaining = bl.check_trailing_stops([p], price=85.0)
+        assert len(remaining) == 1   # safe under wider stop
+ 
+        _, remaining2 = bl.check_trailing_stops([p], price=80.0)
+        assert remaining2 == []      # triggered
+ 
+    # ── Returned list is a new list, not a mutated view ───────────────────
+ 
+    def test_surviving_position_objects_are_identical(self):
+        """
+        The Position objects that survive must be the exact same objects
+        (not copies), so callers don't lose in-place mutations they hold
+        references to.
+        """
+        bl = make_bl()
+        p1 = pos(1, 100.0, 10, signal=1)    # safe (stop=95, price=96)
+        p2 = pos(2, 200.0,  5, signal=1)    # triggered (stop=190, price=96 < 190? No)
+ 
+        # price=189: p2 stop=190, triggered; p1 stop=95, safe
+        pnl, remaining = bl.check_trailing_stops([p1, p2], price=189.0)
+ 
+        # p1 survived and the object identity must be preserved
+        assert remaining[0] is p1
+ 
+ 
+# ─────────────────────────────────────────────────────────────────────────────
+#  12. force_close_all
+# ─────────────────────────────────────────────────────────────────────────────
+ 
+class TestForceCloseAll:
+    """
+    force_close_all uses df.iloc[current_step]["Close"] as the exit price
+    and always returns an empty position list.
+ 
+    PnL per position = volume * (close_price - entry) * signal
+    """
+ 
+    # ── Empty list ────────────────────────────────────────────────────────
+ 
+    def test_no_positions_returns_zero_and_empty(self):
+        """Calling on an empty list is a no-op."""
+        bl = make_bl(close_price=100.0)
+        pnl, remaining = bl.force_close_all([])
+ 
+        assert pnl == pytest.approx(0.0, abs=1e-6)
+        assert remaining == []
+ 
+    # ── Single long ──────────────────────────────────────────────────────
+ 
+    def test_single_long_profit(self):
+        """
+        entry=100, close=120 → profit = 10 * (120-100) * 1 = +200.
+        """
+        bl = make_bl(close_price=120.0)
+        p = pos(1, 100.0, 10, signal=1)
+        pnl, remaining = bl.force_close_all([p])
+ 
+        assert pnl == pytest.approx(200.0, abs=1e-6)
+        assert remaining == []
+ 
+    def test_single_long_loss(self):
+        """
+        entry=100, close=80 → loss = 10 * (80-100) * 1 = -200.
+        """
+        bl = make_bl(close_price=80.0)
+        p = pos(1, 100.0, 10, signal=1)
+        pnl, remaining = bl.force_close_all([p])
+ 
+        assert pnl == pytest.approx(-200.0, abs=1e-6)
+        assert remaining == []
+ 
+    def test_single_long_breakeven(self):
+        """
+        entry=100, close=100 → pnl = 0.
+        """
+        bl = make_bl(close_price=100.0)
+        p = pos(1, 100.0, 10, signal=1)
+        pnl, remaining = bl.force_close_all([p])
+ 
+        assert pnl == pytest.approx(0.0, abs=1e-6)
+        assert remaining == []
+ 
+    # ── Single short ─────────────────────────────────────────────────────
+ 
+    def test_single_short_profit(self):
+        """
+        entry=100, close=80 → profit = 10 * (80-100) * -1 = +200.
+        """
+        bl = make_bl(close_price=80.0)
+        p = pos(1, 100.0, 10, signal=-1)
+        pnl, remaining = bl.force_close_all([p])
+ 
+        assert pnl == pytest.approx(200.0, abs=1e-6)
+        assert remaining == []
+ 
+    def test_single_short_loss(self):
+        """
+        entry=100, close=120 → loss = 10 * (120-100) * -1 = -200.
+        """
+        bl = make_bl(close_price=120.0)
+        p = pos(1, 100.0, 10, signal=-1)
+        pnl, remaining = bl.force_close_all([p])
+ 
+        assert pnl == pytest.approx(-200.0, abs=1e-6)
+        assert remaining == []
+ 
+    def test_single_short_breakeven(self):
+        """
+        entry=100, close=100 → pnl = 0.
+        """
+        bl = make_bl(close_price=100.0)
+        p = pos(1, 100.0, 10, signal=-1)
+        pnl, remaining = bl.force_close_all([p])
+ 
+        assert pnl == pytest.approx(0.0, abs=1e-6)
+        assert remaining == []
+ 
+    # ── Multiple positions: PnL accumulates correctly ────────────────────
+ 
+    def test_multiple_longs_pnl_sums(self):
+        """
+        p1: entry=80,  vol=10, long  → (120-80)*10  = +400
+        p2: entry=100, vol=5,  long  → (120-100)*5  = +100
+        p3: entry=130, vol=8,  long  → (120-130)*8  = -80
+        Total = +420.
+        """
+        bl = make_bl(close_price=120.0)
+        positions = [
+            pos(1,  80.0, 10, signal=1),
+            pos(2, 100.0,  5, signal=1),
+            pos(3, 130.0,  8, signal=1),
+        ]
+        pnl, remaining = bl.force_close_all(positions)
+ 
+        expected = 10*(120-80) + 5*(120-100) + 8*(120-130)
+        assert pnl == pytest.approx(expected, abs=1e-6)   # = 420
+        assert remaining == []
+ 
+    def test_mixed_long_and_short_pnl_sums(self):
+        """
+        close=110.
+        p1: long,  entry=100, vol=10 → (110-100)*10*+1  = +100
+        p2: short, entry=120, vol=10 → (110-120)*10*-1  = +100
+        p3: short, entry=100, vol=10 → (110-100)*10*-1  = -100
+        Total = +100.
+        """
+        bl = make_bl(close_price=110.0)
+        positions = [
+            pos(1, 100.0, 10, signal=1),
+            pos(2, 120.0, 10, signal=-1),
+            pos(3, 100.0, 10, signal=-1),
+        ]
+        pnl, remaining = bl.force_close_all(positions)
+ 
+        expected = (
+            10 * (110 - 100) * 1    # +100
+          + 10 * (110 - 120) * -1   # +100
+          + 10 * (110 - 100) * -1   # -100
+        )
+        assert pnl == pytest.approx(expected, abs=1e-6)   # = +100
+        assert remaining == []
+ 
+    def test_multiple_symbols_all_closed(self):
+        """
+        force_close_all is symbol-agnostic: every position is closed
+        regardless of its symbol field.
+        """
+        bl = make_bl(close_price=110.0)
+        positions = [
+            pos(1, 100.0, 10, signal=1,  symbol="AAPL"),
+            pos(2, 100.0, 10, signal=-1, symbol="MSFT"),
+        ]
+        pnl, remaining = bl.force_close_all(positions)
+ 
+        assert remaining == []
+        # AAPL long: +100, MSFT short (price rose): -100 → net 0
+        assert pnl == pytest.approx(0.0, abs=1e-6)
+ 
+    # ── Uses Close price, not Open ────────────────────────────────────────
+ 
+    def test_uses_close_column_not_open(self):
+        """
+        DataFrame has Open=200, Close=150.
+        force_close_all must use Close=150, not Open=200.
+        PnL = 10 * (150-100) * 1 = +500.
+        """
+        bl = make_bl(open_price=200.0, close_price=150.0)
+        p = pos(1, 100.0, 10, signal=1)
+        pnl, remaining = bl.force_close_all([p])
+ 
+        assert pnl == pytest.approx(500.0, abs=1e-6)
+        assert remaining == []
+ 
+    def test_uses_current_step_row(self):
+        """
+        Multi-row DataFrame; current_step=1 → Close at row 1 is used.
+        row 0: Close=50 (wrong)
+        row 1: Close=130 (correct)
+        PnL = 10 * (130-100) * 1 = +300.
+        """
+        df = pd.DataFrame({"Open": [100.0, 100.0], "Close": [50.0, 130.0]})
+        from src.businesslogic import BusinessLogic
+        bl = BusinessLogic(df=df, balance=100_000.0, current_step=1,
+                           T_indicators=[], MR_indicators=[])
+        p = pos(1, 100.0, 10, signal=1)
+        pnl, remaining = bl.force_close_all([p])
+ 
+        assert pnl == pytest.approx(300.0, abs=1e-6)
+        assert remaining == []
+ 
+    # ── Always returns empty list ─────────────────────────────────────────
+ 
+    def test_always_returns_empty_list(self):
+        """Return value is always [] regardless of how many positions were open."""
+        bl = make_bl(close_price=100.0)
+        positions = [pos(i, 100.0, 10, signal=1) for i in range(1, 6)]
+        _, remaining = bl.force_close_all(positions)
+        assert remaining == []
+ 
+    def test_return_type_is_list_not_none(self):
+        """Returned remaining must be a list, not None."""
+        bl = make_bl(close_price=100.0)
+        _, remaining = bl.force_close_all([pos(1, 100.0, 10, signal=1)])
+        assert isinstance(remaining, list)
