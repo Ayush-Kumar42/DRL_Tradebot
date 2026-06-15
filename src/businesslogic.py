@@ -9,7 +9,7 @@ from typing import Literal
 class Position:
     order: int       # monotonically increasing order index (older = lower)
     price: float     # entry price
-    volume: int      # units held
+    volume: float      # units held
     signal: int      # 1 = long, -1 = short
     symbol: str      # ticker/instrument identifier e.g. "AAPL", "BTCUSDT"
 
@@ -41,7 +41,7 @@ class BusinessLogic:
 
     def calculate_volume(self):
         price = self.df.iloc[self.current_step]["Open"]
-        return int(self.balance // price)
+        return self.balance / price  # float, no int()
 
     def calculate_hurst(self, time_series):
         H, c, data = compute_Hc(time_series, kind="price", simplified=True)
@@ -517,7 +517,7 @@ class BusinessLogic:
         # ── OPEN ──────────────────────────────────────────────────────
         if should_open:
             max_units  = self.calculate_volume()
-            new_volume = int(np.floor(volume_fraction * max_units))
+            new_volume = volume_fraction * max_units
 
             if new_volume <= 0:
                 return positions, 0.0
@@ -538,7 +538,7 @@ class BusinessLogic:
             total_units  = sum(
                 p.volume for p in symbol_positions if p.signal == close_signal
             )
-            units_to_close = int(np.floor(volume_fraction * total_units))
+            units_to_close = volume_fraction * total_units
 
             if units_to_close == 0:
                 return positions, 0.0

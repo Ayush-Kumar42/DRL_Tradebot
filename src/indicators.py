@@ -363,7 +363,22 @@ def load_and_compute(csv_path: str) -> pd.DataFrame:
       - RSI                             (raw RSI value, useful as continuous)
     """
     df = pd.read_csv(csv_path)
-    df["Datetime"] = pd.to_datetime(df["Datetime"])
+
+    # ── Rename columns to match expected schema ──────────────────────────
+    df.rename(columns={
+        "open_time": "Datetime",
+        "open":      "Open",
+        "high":      "High",
+        "low":       "Low",
+        "close":     "Close",
+        "volume":    "Volume",
+    }, inplace=True)
+
+    # rest continues unchanged...
+    df["Datetime"] = pd.to_datetime(df["Datetime"], utc=True)
+    # ── Drop zero-volume bars (no trades, causes div/0 in CMF/VWAP) ─────
+    df = df[df["Volume"] > 0].copy()
+    df.reset_index(drop=True, inplace=True)
     df.sort_values("Datetime", inplace=True)
     df.reset_index(drop=True, inplace=True)
  

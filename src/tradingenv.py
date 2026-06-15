@@ -98,10 +98,9 @@ class TradingEnv(gym.Env):
         row = self.df.iloc[self.current_step]
         obs = list(row[self.continuous_features].values)
         obs.extend(row[["Open", "High", "Low", "Close", "Volume"]].values)
-        if regime == "trending":
-            obs.extend(row[self.T_indicators].values)
-        else:
-            obs.extend(row[self.MR_indicators].values)
+        indicators = self.T_indicators if regime == "trending" else self.MR_indicators
+        signal_cols = [f"{ind}_signal" for ind in indicators]  # ← add _signal suffix
+        obs.extend(row[signal_cols].values)
         return np.array(obs, dtype=np.float32)
 
     # ------------------------------------------------------------------ #

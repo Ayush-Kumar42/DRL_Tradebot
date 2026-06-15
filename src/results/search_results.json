@@ -1,0 +1,1702 @@
+[
+  {
+    "run_id": 1,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run001_pnl_balanced_learning_rate3e-05_n_steps512_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 2,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run002_fifo_learning_rate0p0001_n_steps1024_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 3,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run003_age_weighted_learning_rate3e-05_n_steps1024_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 4,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run004_least_loss_learning_rate3e-05_n_steps512_batch_size128_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 5,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run005_least_loss_learning_rate3e-05_n_steps2048_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 6,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run006_fifo_learning_rate0p0001_n_steps2048_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 7,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run007_fifo_learning_rate0p0003_n_steps512_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 8,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run008_fifo_learning_rate0p0003_n_steps1024_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 9,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run009_fifo_learning_rate3e-05_n_steps2048_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 10,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run010_age_weighted_learning_rate0p0003_n_steps1024_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 11,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run011_most_risk_learning_rate3e-05_n_steps2048_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 12,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run012_least_loss_learning_rate0p0001_n_steps512_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 13,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run013_least_loss_learning_rate3e-05_n_steps512_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 14,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run014_least_loss_learning_rate0p0001_n_steps2048_batch_size128_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 15,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run015_least_loss_learning_rate0p0003_n_steps512_batch_size128_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 16,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run016_age_weighted_learning_rate0p0001_n_steps1024_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 17,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run017_fifo_learning_rate3e-05_n_steps1024_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 18,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run018_least_loss_learning_rate0p0001_n_steps2048_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 19,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run019_age_weighted_learning_rate0p0001_n_steps512_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 20,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run020_most_risk_learning_rate3e-05_n_steps512_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 21,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run021_fifo_learning_rate0p0003_n_steps1024_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 22,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run022_max_profit_learning_rate0p0001_n_steps2048_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 23,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run023_least_loss_learning_rate0p0001_n_steps2048_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 24,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run024_max_profit_learning_rate3e-05_n_steps2048_batch_size128_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 25,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run025_pnl_balanced_learning_rate0p0001_n_steps2048_batch_size128_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 26,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run026_age_weighted_learning_rate0p0003_n_steps2048_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 27,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run027_most_risk_learning_rate3e-05_n_steps512_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 28,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run028_pnl_balanced_learning_rate0p0001_n_steps512_batch_size64_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 29,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run029_most_risk_learning_rate0p0003_n_steps2048_batch_size128_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 30,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run030_most_risk_learning_rate0p0001_n_steps1024_batch_size64_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 31,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run031_most_risk_learning_rate3e-05_n_steps2048_batch_size64_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 32,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run032_least_loss_learning_rate0p0003_n_steps512_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 33,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run033_fifo_learning_rate3e-05_n_steps512_batch_size64_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 34,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run034_fifo_learning_rate0p0003_n_steps512_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 35,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run035_age_weighted_learning_rate0p0003_n_steps2048_batch_size64_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 36,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run036_least_loss_learning_rate0p0001_n_steps2048_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 37,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run037_fifo_learning_rate3e-05_n_steps1024_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 38,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run038_fifo_learning_rate3e-05_n_steps1024_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 39,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run039_max_profit_learning_rate3e-05_n_steps2048_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 40,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run040_max_profit_learning_rate0p0001_n_steps512_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 41,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run041_least_loss_learning_rate3e-05_n_steps1024_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 42,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run042_least_loss_learning_rate3e-05_n_steps512_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 43,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run043_pnl_balanced_learning_rate0p0003_n_steps512_batch_size128_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 44,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run044_age_weighted_learning_rate0p0001_n_steps2048_batch_size128_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 45,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run045_pnl_balanced_learning_rate0p0001_n_steps2048_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 46,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run046_age_weighted_learning_rate3e-05_n_steps512_batch_size64_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 47,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run047_pnl_balanced_learning_rate3e-05_n_steps2048_batch_size128_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 48,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run048_age_weighted_learning_rate3e-05_n_steps512_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 49,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run049_least_loss_learning_rate0p0001_n_steps512_batch_size128_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 50,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run050_most_risk_learning_rate0p0001_n_steps1024_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 51,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run051_max_profit_learning_rate0p0003_n_steps2048_batch_size128_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 52,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run052_fifo_learning_rate0p0001_n_steps512_batch_size128_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 53,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run053_pnl_balanced_learning_rate0p0001_n_steps512_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 54,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run054_max_profit_learning_rate0p0003_n_steps2048_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 55,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run055_pnl_balanced_learning_rate3e-05_n_steps2048_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 56,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run056_pnl_balanced_learning_rate0p0001_n_steps512_batch_size128_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 57,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run057_age_weighted_learning_rate0p0003_n_steps2048_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 58,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run058_max_profit_learning_rate0p0001_n_steps2048_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 59,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run059_max_profit_learning_rate0p0001_n_steps2048_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 60,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run060_most_risk_learning_rate0p0001_n_steps512_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 61,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run061_pnl_balanced_learning_rate0p0001_n_steps512_batch_size128_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 62,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run062_fifo_learning_rate0p0003_n_steps512_batch_size64_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 63,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run063_most_risk_learning_rate0p0001_n_steps1024_batch_size128_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 64,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run064_most_risk_learning_rate3e-05_n_steps2048_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 65,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run065_least_loss_learning_rate0p0001_n_steps2048_batch_size64_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 66,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run066_pnl_balanced_learning_rate0p0003_n_steps512_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 67,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run067_fifo_learning_rate3e-05_n_steps512_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 68,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run068_least_loss_learning_rate0p0001_n_steps512_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 69,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run069_pnl_balanced_learning_rate0p0003_n_steps2048_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 70,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run070_fifo_learning_rate3e-05_n_steps512_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 71,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run071_max_profit_learning_rate0p0001_n_steps512_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 72,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run072_age_weighted_learning_rate0p0003_n_steps2048_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 73,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run073_pnl_balanced_learning_rate3e-05_n_steps1024_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 74,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run074_max_profit_learning_rate3e-05_n_steps512_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 75,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run075_least_loss_learning_rate0p0003_n_steps1024_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 76,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run076_fifo_learning_rate3e-05_n_steps512_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 77,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run077_fifo_learning_rate0p0003_n_steps2048_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 78,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run078_least_loss_learning_rate0p0001_n_steps512_batch_size128_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 79,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run079_max_profit_learning_rate0p0003_n_steps2048_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 80,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run080_least_loss_learning_rate0p0001_n_steps512_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 81,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run081_fifo_learning_rate0p0003_n_steps1024_batch_size128_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 82,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run082_fifo_learning_rate0p0001_n_steps1024_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 83,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run083_max_profit_learning_rate0p0003_n_steps512_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 84,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run084_most_risk_learning_rate0p0001_n_steps2048_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 85,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run085_max_profit_learning_rate0p0001_n_steps1024_batch_size64_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 86,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run086_max_profit_learning_rate0p0003_n_steps1024_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 87,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run087_fifo_learning_rate0p0003_n_steps2048_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 88,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run088_fifo_learning_rate0p0001_n_steps512_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 89,
+    "algo": "PPO",
+    "strategy": "max_profit",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 512,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run089_max_profit_learning_rate0p0001_n_steps512_batch_size64_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 90,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run090_pnl_balanced_learning_rate3e-05_n_steps2048_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 91,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run091_fifo_learning_rate0p0001_n_steps1024_batch_size64_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 92,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run092_least_loss_learning_rate0p0003_n_steps2048_batch_size128_gamma0p95_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 93,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run093_pnl_balanced_learning_rate3e-05_n_steps1024_batch_size64_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 94,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run094_age_weighted_learning_rate0p0001_n_steps2048_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 95,
+    "algo": "PPO",
+    "strategy": "least_loss",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.0
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run095_least_loss_learning_rate0p0003_n_steps1024_batch_size128_gamma0p99_ent_coef0p0.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 96,
+    "algo": "PPO",
+    "strategy": "pnl_balanced",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run096_pnl_balanced_learning_rate3e-05_n_steps1024_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 97,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.95,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run097_most_risk_learning_rate0p0003_n_steps2048_batch_size128_gamma0p95_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 98,
+    "algo": "PPO",
+    "strategy": "most_risk",
+    "params": {
+      "learning_rate": 3e-05,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run098_most_risk_learning_rate3e-05_n_steps1024_batch_size64_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 99,
+    "algo": "PPO",
+    "strategy": "fifo",
+    "params": {
+      "learning_rate": 0.0001,
+      "n_steps": 1024,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run099_fifo_learning_rate0p0001_n_steps1024_batch_size128_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  },
+  {
+    "run_id": 100,
+    "algo": "PPO",
+    "strategy": "age_weighted",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 128,
+      "gamma": 0.99,
+      "ent_coef": 0.01
+    },
+    "mean_reward": null,
+    "std_reward": null,
+    "train_time_s": null,
+    "log_file": "c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\results\\logs\\run100_age_weighted_learning_rate0p0003_n_steps2048_batch_size128_gamma0p99_ent_coef0p01.log",
+    "error": "AttributeError: property 'logger' of 'TqdmCallback' object has no setter\nTraceback (most recent call last):\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 235, in run_single\n    callback=TqdmCallback(total=TRAIN_TIMESTEPS, logger=logger),\n             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"c:\\Users\\Ayushh\\python_projects\\new_tradebot\\src\\hyperparam_optim.py\", line 151, in __init__\n    self.logger = logger\n    ^^^^^^^^^^^\nAttributeError: property 'logger' of 'TqdmCallback' object has no setter\n"
+  }
+]
