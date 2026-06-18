@@ -1,0 +1,28 @@
+{
+  "mean_reward": 17732.6812,
+  "stage": 1,
+  "trial_id": 20,
+  "params": {
+    "learning_rate": 5e-05,
+    "n_steps": 1024,
+    "batch_size": 256,
+    "n_epochs": 10,
+    "gamma": 0.999,
+    "gae_lambda": 0.85,
+    "clip_range": 0.3,
+    "ent_coef": 0.02,
+    "vf_coef": 1.0,
+    "max_grad_norm": 0.5,
+    "net_arch": "large",
+    "activation_fn": "elu",
+    "close_strategy": "max_profit"
+  },
+  "mean_policy_loss": 0.225715,
+  "mean_value_loss": 6885.71348,
+  "mean_entropy": -7.09722,
+  "mean_approx_kl": 5517.68983,
+  "mean_clip_frac": 0.974725,
+  "final_policy_loss": 0.271885,
+  "final_value_loss": 32.621226,
+  "final_entropy": -7.098914
+}
