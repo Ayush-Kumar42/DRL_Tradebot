@@ -18,7 +18,7 @@ class TradingEnv(gym.Env):
 
     All trade execution (open, close, trailing stop) is delegated to
     BusinessLogic.  The environment is responsible only for:
-      - Building observations
+      - Building observations (normalized — see `Observation normalization`)
       - Computing the Hurst exponent / regime
       - Advancing `current_step`
       - Computing reward (normalized log-return of portfolio valuation,
@@ -47,7 +47,49 @@ class TradingEnv(gym.Env):
        partial close the log is left untouched for the remaining open
        volume (no reset) since the weighting by closed_qty already accounts
        for how much of the position is being "cashed in".
+
+    Observation normalization
+    --------------------------
+    Raw OHLCV/price-derived features are non-stationary (price drifts over
+    the life of a dataset), so they cannot be safely normalized with a
+    single global statistic fit once at `reset()` — that would both leak
+    future information into early steps and go stale by the end of a long
+    episode. Instead every numeric observation field is normalized
+    *causally*: any statistic used (rolling mean/std, rolling min/max) is
+    computed only from data up to and including `current_step`, using a
+    trailing window (`norm_window`, default 200 bars). Three transform
+    families are used, chosen per-feature by its statistical shape:
+
+      - "ratio_log"  : log of the ratio to a trailing reference, e.g.
+                       ln(Close / Close.rolling.mean()). Removes the price
+                       level entirely so the network sees stationary,
+                       roughly-zero-centered relative moves regardless of
+                       whether BTC is at 20k or 90k. Used for Open/High/
+                       Low/Close/VWAP.
+      - "log_zscore" : log1p (to tame heavy right tails) then a rolling
+                       z-score. Used for strictly-positive, skewed
+                       magnitude features: Volume, ATR, PARKINSON.
+      - "zscore"     : plain rolling z-score, no log. Used for features
+                       that are already roughly symmetric but not
+                       naturally bounded: VOLATILITY.
+      - "passthrough": already on a clean, bounded, semantically-meaningful
+                       scale, so rescaling would only relabel it without
+                       adding information. Used for CMF ([-1, 1]),
+                       PRICE_ACTION ([0, 1]), and every `*_signal` column
+                       ({-1, 0, +1}).
+
+    All rolling statistics use only `df` rows `[0, current_step]` (inclusive)
+    so normalization at any step is reproducible from data the agent could
+    actually have seen up to that point.
     """
+
+    # Per-feature normalization strategy. Anything in `continuous_features`
+    # or the OHLC/Volume block not listed here defaults to "zscore" as a
+    # safe fallback (see `_normalize_value`).
+    _PRICE_RATIO_FEATURES = {"Open", "High", "Low", "Close", "VWAP"}
+    _LOG_ZSCORE_FEATURES = {"Volume", "ATR", "PARKINSON"}
+    _ZSCORE_FEATURES = {"VOLATILITY"}
+    _PASSTHROUGH_FEATURES = {"CMF", "PRICE_ACTION"}
 
     def __init__(
         self,
@@ -58,6 +100,8 @@ class TradingEnv(gym.Env):
         initial_balance: float,
         close_strategy: CloseStrategy = "fifo",
         trail_pct: float = 0.05,
+        norm_window: int = 200,
+        norm_eps: float = 1e-8,
     ):
         super().__init__()
 
@@ -70,6 +114,13 @@ class TradingEnv(gym.Env):
         self.close_strategy = close_strategy
         self.trail_pct = trail_pct
 
+        # --- Normalization config ---
+        # `norm_window` bars of trailing history are used to compute rolling
+        # mean/std (or rolling mean reference, for the ratio transform).
+        # Must be causal: only ever indexes df[max(0, t - window + 1) : t+1].
+        self.norm_window = norm_window
+        self.norm_eps = norm_eps
+
         # --- Action space: one weight per indicator + volume fraction ---
         self.action_space = spaces.Box(
             low=0.0,
@@ -80,6 +131,12 @@ class TradingEnv(gym.Env):
 
         # --- Observation space ---
         # continuous_features  +  OHLCV (5)  +  regime indicator signals
+        # Bounds reflect the *normalized* ranges, not raw data:
+        #   - ratio_log / log_zscore / zscore features are unbounded in
+        #     principle (clipped in practice, see `_normalize_value`) ->
+        #     [-inf, inf] is the honest declared bound.
+        #   - passthrough features (CMF, PRICE_ACTION, *_signal) keep their
+        #     natural bounds.
         obs_dim = len(continuous_features) + 5 + len(T_indicators)
         self.observation_space = spaces.Box(
             low=-np.inf, high=np.inf, shape=(obs_dim,), dtype=np.float32
@@ -139,16 +196,109 @@ class TradingEnv(gym.Env):
         return float(np.log(numer / denom))
 
     # ------------------------------------------------------------------ #
+    #  Observation normalization                                          #
+    # ------------------------------------------------------------------ #
+
+    def _causal_window(self, column: str) -> np.ndarray:
+        """
+        Trailing window of `column` ending at (and including) current_step,
+        length `min(norm_window, current_step + 1)`. Always causal: never
+        touches rows beyond current_step.
+        """
+        start = max(0, self.current_step - self.norm_window + 1)
+        end = self.current_step + 1  # inclusive of current_step
+        return self.df[column].iloc[start:end].to_numpy(dtype=np.float64)
+
+    def _normalize_value(self, column: str, raw_value: float) -> float:
+        """
+        Normalize a single scalar observation field using only causal
+        (trailing, up-to-current_step) statistics. Dispatches by feature
+        name to one of four transforms; see class docstring for rationale.
+        """
+        # Signal columns (already {-1, 0, +1}) and other declared
+        # passthrough features need no rescaling.
+        if column in self._PASSTHROUGH_FEATURES or column.endswith("_signal"):
+            return float(raw_value)
+
+        window = self._causal_window(column)
+
+        if column in self._PRICE_RATIO_FEATURES:
+            return self._ratio_log(raw_value, window)
+
+        if column in self._LOG_ZSCORE_FEATURES:
+            return self._log_zscore(raw_value, window)
+
+        # _ZSCORE_FEATURES and anything else unrecognised -> plain z-score,
+        # the safest general-purpose fallback for an unbounded continuous
+        # feature we don't have special-case knowledge about.
+        return self._zscore(raw_value, window)
+
+    def _ratio_log(self, raw_value: float, window: np.ndarray) -> float:
+        """
+        ln(raw_value / trailing_mean(window)). Removes the absolute price
+        level (non-stationary) and leaves a stationary, roughly-zero-
+        centered relative measure. Clipped to +/-5 (~e^5 ~ 148x) to bound
+        the effect of any single bad tick or near-zero reference.
+        """
+        ref = float(np.mean(window))
+        ref = ref if abs(ref) > self.norm_eps else self.norm_eps
+        val = raw_value if raw_value > self.norm_eps else self.norm_eps
+        result = float(np.log(val / ref))
+        return float(np.clip(result, -5.0, 5.0))
+
+    def _log_zscore(self, raw_value: float, window: np.ndarray) -> float:
+        """
+        log1p(raw_value) z-scored against the log1p'd trailing window.
+        log1p tames heavy right tails (Volume, ATR, PARKINSON are all
+        strictly non-negative and can spike by orders of magnitude), and
+        the subsequent z-score gives the network a comparable, roughly
+        unit-scale signal regardless of the asset's native volume/range.
+        Clipped to +/-5 standard deviations.
+        """
+        log_window = np.log1p(np.clip(window, 0.0, None))
+        mean = float(np.mean(log_window))
+        std = float(np.std(log_window))
+        std = std if std > self.norm_eps else self.norm_eps
+        log_val = float(np.log1p(max(raw_value, 0.0)))
+        result = (log_val - mean) / std
+        return float(np.clip(result, -5.0, 5.0))
+
+    def _zscore(self, raw_value: float, window: np.ndarray) -> float:
+        """
+        Plain rolling z-score: (raw_value - trailing_mean) / trailing_std.
+        Used for features that are already roughly symmetric (no heavy
+        one-sided tail) but not naturally bounded, e.g. VOLATILITY.
+        Clipped to +/-5 standard deviations.
+        """
+        mean = float(np.mean(window))
+        std = float(np.std(window))
+        std = std if std > self.norm_eps else self.norm_eps
+        result = (raw_value - mean) / std
+        return float(np.clip(result, -5.0, 5.0))
+
+    # ------------------------------------------------------------------ #
     #  Observation builder                                                 #
     # ------------------------------------------------------------------ #
 
     def get_observation(self, regime: str) -> np.ndarray:
         row = self.df.iloc[self.current_step]
-        obs = list(row[self.continuous_features].values)
-        obs.extend(row[["Open", "High", "Low", "Close", "Volume"]].values)
+
+        obs: list[float] = []
+
+        # continuous_features: each gets its dedicated normalization.
+        for col in self.continuous_features:
+            obs.append(self._normalize_value(col, float(row[col])))
+
+        # OHLCV: O/H/L/C normalized via price-ratio, Volume via log-zscore.
+        for col in ["Open", "High", "Low", "Close", "Volume"]:
+            obs.append(self._normalize_value(col, float(row[col])))
+
+        # Regime-specific indicator signals: already {-1, 0, +1}, passthrough.
         indicators = self.T_indicators if regime == "trending" else self.MR_indicators
-        signal_cols = [f"{ind}_signal" for ind in indicators]  # add _signal suffix
-        obs.extend(row[signal_cols].values)
+        signal_cols = [f"{ind}_signal" for ind in indicators]
+        for col in signal_cols:
+            obs.append(self._normalize_value(col, float(row[col])))
+
         return np.array(obs, dtype=np.float32)
 
     # ------------------------------------------------------------------ #
