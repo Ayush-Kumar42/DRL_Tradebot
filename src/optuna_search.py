@@ -15,6 +15,7 @@ Results are persisted after every trial:
     best_metrics.json         – detailed metrics for that model
     stage{1,2}_results.csv    – per-trial summaries per stage
     logs/                     – per-trial log files
+    position_logs/            – per-run position-change CSVs (stage 2 only)
 
 Usage
 -----
@@ -35,6 +36,7 @@ Requirements
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import logging
 import os
@@ -61,14 +63,15 @@ from tradingenv import TradingEnv
 #  Paths
 # ─────────────────────────────────────────────────────────────────────────────
 
-BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH   = os.path.join(BASE_DIR, "data", "BTCUSDT_1m.csv")
-RESULTS_DIR = os.path.join(BASE_DIR, "results", "optuna")
-LOGS_DIR    = os.path.join(RESULTS_DIR, "logs")
-BEST_DIR    = os.path.join(RESULTS_DIR, "best_model")
-DB_PATH     = f"sqlite:///{os.path.join(RESULTS_DIR, 'study.db')}"
+BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH     = os.path.join(BASE_DIR, "data", "BTCUSDT_1m.csv")
+RESULTS_DIR   = os.path.join(BASE_DIR, "results", "optuna")
+LOGS_DIR      = os.path.join(RESULTS_DIR, "logs")
+BEST_DIR      = os.path.join(RESULTS_DIR, "best_model")
+POS_LOGS_DIR  = os.path.join(RESULTS_DIR, "position_logs")
+DB_PATH       = f"sqlite:///{os.path.join(RESULTS_DIR, 'study.db')}"
 
-for _d in (RESULTS_DIR, LOGS_DIR, BEST_DIR):
+for _d in (RESULTS_DIR, LOGS_DIR, BEST_DIR, POS_LOGS_DIR):
     os.makedirs(_d, exist_ok=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -142,6 +145,165 @@ def make_env(df: pd.DataFrame, strategy: str) -> Monitor:
         trail_pct=0.05,
     )
     return Monitor(env)
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Position-change logger (stage 2 only)
+# ─────────────────────────────────────────────────────────────────────────────
+
+# CSV columns written for every position held at a change step.
+# One row per position per change event (multiple rows if several positions
+# are open when a change is detected).
+_POS_CSV_FIELDS = [
+    # When / context
+    "step",
+    "action_0", "action_1", "action_2", "action_3", "action_4",   # indicator weights
+    "action_vol",                                                   # volume fraction
+    "change_type",   # "opened" | "closed" | "modified"
+    # Position attributes
+    "pos_order",
+    "pos_price",
+    "pos_volume",
+    "pos_signal",
+]
+
+
+class PositionLogCallback(BaseCallback):
+    """
+    Stage-2 callback that writes a CSV row for every open position
+    whenever the position list changes between two consecutive steps.
+
+    One file is created per training run, written to POS_LOGS_DIR:
+        position_logs/s2_t{trial_id:04d}_{strategy}.csv
+
+    Change detection
+    ----------------
+    After each env step we compare the current `env.positions` snapshot
+    against the snapshot from the previous step.  A change is detected when:
+      - the number of positions differs, OR
+      - any position's (order, volume) pair differs
+        (order handles opens/closes, volume handles partial closes)
+
+    On a change, we write one row per currently-open position, tagging the
+    event with a `change_type`:
+      "opened"   – net new position appeared (order not seen before)
+      "closed"   – a position that was open is now gone (or volume reduced)
+      "modified" – neither purely open nor purely close (e.g. simultaneous
+                   open+partial-close in one step)
+
+    The action that caused the change is written alongside each row so you
+    can correlate indicator weights with position changes.
+    """
+
+    def __init__(self, csv_path: str, verbose: int = 0):
+        super().__init__(verbose)
+        self._csv_path = csv_path
+        self._prev_positions: list[dict] | None = None  # snapshot of last step
+        self._file = None
+        self._writer = None
+
+    # ── Lifecycle ────────────────────────────────────────────────────────────
+
+    def _on_training_start(self) -> None:
+        self._file   = open(self._csv_path, "w", newline="", buffering=1)
+        self._writer = csv.DictWriter(self._file, fieldnames=_POS_CSV_FIELDS)
+        self._writer.writeheader()
+        self._prev_positions = None
+
+    def _on_training_end(self) -> None:
+        if self._file:
+            self._file.close()
+            self._file   = None
+            self._writer = None
+
+    # ── Per-step hook ────────────────────────────────────────────────────────
+
+    def _on_step(self) -> bool:
+        # Unwrap Monitor → TradingEnv to read live position state.
+        # `self.training_env` is a VecEnv; index 0 is our single env.
+        try:
+            inner_env: TradingEnv = self.training_env.envs[0].unwrapped
+        except (AttributeError, IndexError):
+            return True
+
+        current_step = getattr(inner_env, "current_step", None)
+        positions    = getattr(inner_env, "positions", [])
+
+        # Build a lightweight snapshot: list of (order, volume) tuples
+        # sufficient to detect any change without holding Position refs.
+        current_snapshot = [(p.order, p.volume) for p in positions]
+
+        if self._prev_positions is not None and current_snapshot != self._prev_positions:
+            # Determine change type from the snapshots
+            prev_orders    = {o for o, _ in self._prev_positions}
+            current_orders = {p.order for p in positions}
+
+            new_orders     = current_orders - prev_orders
+            removed_orders = prev_orders    - current_orders
+            prev_vol       = {o: v for o, v in self._prev_positions}
+            volume_changed = any(
+                p.volume != prev_vol.get(p.order, p.volume)
+                for p in positions
+                if p.order in prev_orders
+            )
+
+            if new_orders and not removed_orders and not volume_changed:
+                change_type = "opened"
+            elif removed_orders and not new_orders and not volume_changed:
+                change_type = "closed"
+            else:
+                change_type = "modified"
+
+            # The action that produced this step's transition.
+            # self.locals["actions"] is shape (n_envs, action_dim) after _on_step.
+            action = self.locals.get("actions")
+            if action is not None:
+                action = action[0]   # single env → 1-D array
+            else:
+                action = []
+
+            self._write_rows(
+                step=current_step,
+                positions=positions,
+                action=action,
+                change_type=change_type,
+            )
+
+        self._prev_positions = current_snapshot
+        return True
+
+    # ── Writer ───────────────────────────────────────────────────────────────
+
+    def _write_rows(
+        self,
+        step: int,
+        positions: list,
+        action,
+        change_type: str,
+    ) -> None:
+        """Write one CSV row per currently-open position."""
+        # Unpack action into named slots; pad with None if shorter than expected.
+        act = list(action) if action is not None and len(action) else []
+        n_indicator_weights = len(_POS_CSV_FIELDS) - 1 - 2 - 4   # step, change_type, pos_*
+        # Simpler: just index directly by known layout (4 indicator weights + vol = 5)
+        def _a(i):
+            return round(float(act[i]), 6) if i < len(act) else None
+
+        for p in positions:
+            row = {
+                "step":        step,
+                "action_0":    _a(0),
+                "action_1":    _a(1),
+                "action_2":    _a(2),
+                "action_3":    _a(3),
+                "action_4":    _a(4),
+                "action_vol":  _a(4),   # volume fraction is last element
+                "change_type": change_type,
+                "pos_order":   p.order,
+                "pos_price":   round(p.price,  6),
+                "pos_volume":  round(p.volume, 8),
+                "pos_signal":  p.signal,
+            }
+            self._writer.writerow(row)
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Metric-collecting callback (policy loss, value loss, entropy, approx KL)
@@ -389,10 +551,15 @@ def run_trial(
     stage: int,
     trial_id: int,
     enable_pruning: bool = False,
+    pos_log_path: str | None = None,
 ) -> dict:
     """
     Train one PPO config and return a result dict with all metrics.
     `trial` may be None when running fixed configs in stage 2.
+
+    If `pos_log_path` is provided, a PositionLogCallback is attached that
+    writes a CSV row for every open position whenever the position list
+    changes between consecutive steps.
     """
     strategy  = params["close_strategy"]
     run_name  = f"s{stage}_t{trial_id:04d}_{strategy}"
@@ -417,6 +584,8 @@ def run_trial(
         f"grad={params['max_grad_norm']}  arch={arch_str}  act={act_str}"
     )
     print(f"  Training for {train_steps:,} steps …")
+    if pos_log_path:
+        print(f"  Position log → {pos_log_path}")
     print(_sep, flush=True)
 
     result: dict[str, Any] = {
@@ -449,10 +618,15 @@ def run_trial(
             trial_label=trial_label,
         )
 
+        # Build callback list: always include metrics; add position logger for stage 2
+        callbacks = [metrics_cb]
+        if pos_log_path is not None:
+            callbacks.append(PositionLogCallback(csv_path=pos_log_path))
+
         t0 = time.time()
         model.learn(
             total_timesteps=train_steps,
-            callback=metrics_cb,
+            callback=callbacks,
             progress_bar=False,  # we print our own rollout summaries
             reset_num_timesteps=True,
         )
@@ -602,6 +776,7 @@ def run_stage1(df: pd.DataFrame, n_trials: int = 60) -> pd.DataFrame:
             stage=1,
             trial_id=trial.number,
             enable_pruning=True,
+            # No position logging in stage 1
         )
         nonlocal results
         results = _merge_results(results, res)
@@ -627,6 +802,9 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
     """
     Runs refinement on the specific trial indexes defined in STAGE2_TRIAL_INDEXES.
     The `top_k` argument is accepted for CLI compatibility but not used here.
+
+    Each of the five training runs writes its own position-change CSV to:
+        results/optuna/position_logs/s2_t{trial_id:04d}_{strategy}.csv
     """
     selected_indexes = STAGE2_TRIAL_INDEXES
     n_configs = len(selected_indexes)
@@ -634,6 +812,7 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
     print(f"\n{'='*80}")
     print(f"STAGE 2  –  Refinement  ({STAGE_STEPS[2]:,} steps × {n_configs} configs)")
     print(f"  Trial indexes: {selected_indexes}")
+    print(f"  Position logs → {POS_LOGS_DIR}/")
     print(f"{'='*80}\n")
 
     global _best_reward
@@ -675,11 +854,12 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
 
     stage2_start = time.time()
     for i, row in enumerate(selected.itertuples(), 1):
-        params  = {c: getattr(row, c) for c in param_cols}
-        elapsed = time.time() - stage2_start
-        done    = i - 1
-        avg_s   = elapsed / done if done else 0
-        eta_s   = avg_s * (n_configs - done) if done else 0
+        params   = {c: getattr(row, c) for c in param_cols}
+        strategy = params["close_strategy"]
+        elapsed  = time.time() - stage2_start
+        done     = i - 1
+        avg_s    = elapsed / done if done else 0
+        eta_s    = avg_s * (n_configs - done) if done else 0
         print(
             f"\n{'='*80}\n"
             f"  STAGE 2 — Config {i}/{n_configs}"
@@ -690,6 +870,14 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
             + f"\n{'='*80}",
             flush=True,
         )
+
+        # One position-log CSV per training run, named by trial_id + strategy
+        # so files are self-documenting and never collide across runs.
+        pos_log_path = os.path.join(
+            POS_LOGS_DIR,
+            f"s2_t{row.trial_id:04d}_{strategy}.csv",
+        )
+
         res = run_trial(
             trial=None,
             params=params,
@@ -698,6 +886,7 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
             stage=2,
             trial_id=row.trial_id,   # preserve original stage-1 trial_id for traceability
             enable_pruning=False,
+            pos_log_path=pos_log_path,
         )
         results = _merge_results(results, res)
         _save_stage_results(results, stage=2)
