@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from hurst import compute_Hc
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 
 
@@ -9,9 +9,8 @@ from typing import Literal
 class Position:
     order: int       # monotonically increasing order index (older = lower)
     price: float     # entry price
-    volume: float      # units held
+    volume: float    # units held
     signal: int      # 1 = long, -1 = short
-    symbol: str      # ticker/instrument identifier e.g. "AAPL", "BTCUSDT"
 
 
 CloseStrategy = Literal[
@@ -34,6 +33,40 @@ class BusinessLogic:
         self.trading_threshold = 0.3
         self.trail_pct = 0.05
         self.order_counter = 0   # monotonically increasing; incremented on every new position
+
+        # ------------------------------------------------------------------ #
+        #  Trailing-stop state                                                #
+        # ------------------------------------------------------------------ #
+        #
+        # One global trailing stop per direction — no per-position tracking,
+        # no heap.  All open positions on one side share a single stop level.
+        #
+        # Longs
+        # -----
+        #   price_peak       : highest price seen since the first long was
+        #                      opened in the current cluster (while at least
+        #                      one long is open).  Set to the entry price on
+        #                      the first open; ratchets upward every step and
+        #                      on every subsequent open; reset to None when
+        #                      all longs are closed.
+        #   global_long_stop : price_peak * (1 - trail_pct).  Rises with the
+        #                      peak, never falls.  If price <= global_long_stop
+        #                      on any step, ALL open longs are closed at once.
+        #
+        # Shorts  (exact mirror, direction reversed)
+        # ------
+        #   price_trough      : lowest price seen since the first short was
+        #                       opened.  Ratchets downward; reset to None
+        #                       when all shorts are closed.
+        #   global_short_stop : price_trough * (1 + trail_pct).  Falls with
+        #                       the trough, never rises.  If price >=
+        #                       global_short_stop, ALL open shorts are closed.
+
+        self.price_peak: float | None = None        # highest price while longs are open
+        self.global_long_stop: float | None = None  # price_peak * (1 - trail_pct)
+
+        self.price_trough: float | None = None       # lowest price while shorts are open
+        self.global_short_stop: float | None = None  # price_trough * (1 + trail_pct)
 
     # ------------------------------------------------------------------ #
     #  Helpers                                                             #
@@ -87,16 +120,13 @@ class BusinessLogic:
     def _prepare_close(
         self,
         positions: list[Position],
-        symbol: str,
         signal: int,
     ) -> tuple[list[Position], int]:
         """
-        Filter positions matching both `symbol` and `signal`.
-        Returns (matching_positions, total_units_held).
-        Symbol is checked first so strategies never touch positions in a
-        different instrument even if they share the same direction.
+        Filter positions matching `signal`. Returns (matching_positions,
+        total_units_held). Single-instrument now, so no symbol filter.
         """
-        matching = [p for p in positions if p.symbol == symbol and p.signal == signal]
+        matching = [p for p in positions if p.signal == signal]
         total_units = sum(p.volume for p in matching)
         return matching, total_units
 
@@ -106,7 +136,6 @@ class BusinessLogic:
         sorted_positions: list[Position],
         price: float,
         units_to_close: int,
-        symbol: str = "",
     ) -> tuple[list[Position], float]:
         """
         Walk through `sorted_positions` in priority order, draining
@@ -138,6 +167,36 @@ class BusinessLogic:
         return remaining, total_profit
 
     # ------------------------------------------------------------------ #
+    #  Trailing-stop registration (called whenever a position opens)      #
+    # ------------------------------------------------------------------ #
+
+    def _register_stop(self, position: Position) -> None:
+        """
+        Record the opening of a new position and initialise or ratchet the
+        global trailing stop for that side.
+
+        On the very first open in a direction, price_peak / price_trough is
+        set to the entry price and the global stop is computed from it.  On
+        subsequent pyramid opens in the same direction the peak/trough is
+        ratcheted (upward for longs, downward for shorts) so that a new
+        entry at a less favourable price never tightens the stop that is
+        already protecting the earlier positions.
+        """
+        if position.signal == 1:
+            if self.price_peak is None:
+                self.price_peak = position.price
+            else:
+                self.price_peak = max(self.price_peak, position.price)
+            self.global_long_stop = self.price_peak * (1 - self.trail_pct)
+
+        else:  # signal == -1
+            if self.price_trough is None:
+                self.price_trough = position.price
+            else:
+                self.price_trough = min(self.price_trough, position.price)
+            self.global_short_stop = self.price_trough * (1 + self.trail_pct)
+
+    # ------------------------------------------------------------------ #
     #  Trailing stops                                                      #
     # ------------------------------------------------------------------ #
 
@@ -146,77 +205,67 @@ class BusinessLogic:
         positions: list[Position],
         price: float,
     ) -> tuple[float, list[Position]]:
-        """
-        Evaluate trailing stops for every open position and close those
-        whose stop has been breached.
-
-        Stop prices
-        -----------
-        Long  (signal=+1): stop = peak * (1 - trail_pct)
-            where peak = entry price (conservative: we don't track intra-bar
-            highs inside BusinessLogic, so `entry` serves as the reference).
-            The environment should pass the current bar's Open as `price`.
-        Short (signal=-1): stop = trough * (1 + trail_pct)
-            where trough = entry price.
-
-        The original TradingEnv tracked `highest_price` per position to
-        produce a true trailing peak.  BusinessLogic uses the Position
-        dataclass which has no such field, so the stop is anchored to
-        `entry` rather than the running high/low.  If you need a true
-        trailing high you can subclass Position to add `highest_price` /
-        `lowest_price` and update this method accordingly.
-
-        Returns
-        -------
-        (total_pnl, remaining_positions)
-            total_pnl           – sum of all realised PnL from stopped-out positions
-            remaining_positions – positions list with stopped-out entries removed
-        """
         total_pnl = 0.0
-        remaining: list[Position] = []
+        remaining = list(positions)
+        stop_triggered = False
 
-        for p in positions:
-            if p.signal == 1:
-                # Long trailing stop
-                peak = p.price          # conservative anchor; see docstring
-                stop = peak * (1 - self.trail_pct)
-                triggered = price <= stop
-            else:
-                # Short trailing stop
-                trough = p.price        # conservative anchor
-                stop = trough * (1 + self.trail_pct)
-                triggered = price >= stop
+        # ── Longs ──────────────────────────────────────────────
+        if positions and positions[-1].signal == 1:
+            self.price_peak = max(self.price_peak or price, price)
+            self.global_long_stop = self.price_peak * (1 - self.trail_pct)
 
-            if triggered:
-                total_pnl += p.volume * (price - p.price) * p.signal
-            else:
-                remaining.append(p)
+            if price <= self.global_long_stop:
+                stop_triggered = True
+
+                for p in remaining:
+                    total_pnl += p.volume * (price - p.price)
+
+                remaining = []
+                self.price_peak = None
+                self.global_long_stop = None
+
+        # ── Shorts ─────────────────────────────────────────────
+        elif positions and positions[-1].signal == -1:
+            self.price_trough = min(self.price_trough or price, price)
+            self.global_short_stop = self.price_trough * (1 + self.trail_pct)
+
+            if price >= self.global_short_stop:
+                stop_triggered = True
+
+                for p in remaining:
+                    total_pnl += p.volume * (price - p.price) * -1
+
+                remaining = []
+                self.price_trough = None
+                self.global_short_stop = None
+
+        if not stop_triggered:
+            return 0.0, positions
 
         return total_pnl, remaining
-
-    # ------------------------------------------------------------------ #
-    #  Force-close all positions (end of episode)                          #
-    # ------------------------------------------------------------------ #
 
     def force_close_all(
         self,
         positions: list[Position],
     ) -> tuple[float, list[Position]]:
         """
-        Immediately close every open position at the current bar's Close price.
-        Used at episode termination so the agent is never left holding positions
-        across episodes.
+        Immediately close every open position at the current bar's Close
+        price.  Used at episode termination so the agent is never left
+        holding positions across episodes.  Resets all trailing-stop state
+        so the next episode starts clean.
 
         Returns
         -------
         (total_pnl, [])
-            total_pnl – sum of all realised PnL
-            []        – empty position list (all positions are gone)
         """
         price = self.df.iloc[self.current_step]["Close"]
         total_pnl = sum(
             p.volume * (price - p.price) * p.signal for p in positions
         )
+        self.price_peak = None
+        self.global_long_stop = None
+        self.price_trough = None
+        self.global_short_stop = None
         return total_pnl, []
 
     # ------------------------------------------------------------------ #
@@ -229,7 +278,6 @@ class BusinessLogic:
         price: float,
         signal: int,
         units_to_close: int,
-        symbol: str = "",
     ) -> tuple[list[Position], float]:
         """
         Close positions with the highest per-unit profit first.
@@ -242,7 +290,7 @@ class BusinessLogic:
         Works symmetrically for longs and shorts because `* signal` already
         handles the direction.
         """
-        matching, _ = self._prepare_close(positions, symbol, signal)
+        matching, _ = self._prepare_close(positions, signal)
         sorted_pos = sorted(
             matching,
             key=lambda p: (price - p.price) * signal,
@@ -260,7 +308,6 @@ class BusinessLogic:
         price: float,
         signal: int,
         units_to_close: int,
-        symbol: str = "",
     ) -> tuple[list[Position], float]:
         """
         Among losing positions, close those with the smallest absolute loss
@@ -273,7 +320,7 @@ class BusinessLogic:
 
         Works for both longs and shorts because `* signal` normalises direction.
         """
-        matching, _ = self._prepare_close(positions, symbol, signal)
+        matching, _ = self._prepare_close(positions, signal)
 
         def least_loss_key(p):
             pnl = (price - p.price) * signal
@@ -294,14 +341,13 @@ class BusinessLogic:
         price: float,
         signal: int,
         units_to_close: int,
-        symbol: str = "",
     ) -> tuple[list[Position], float]:
         """
         Close the oldest positions first (lowest order index = entered earliest).
         Direction-agnostic: `order` is purely chronological, so this works
         identically for longs and shorts.
         """
-        matching, _ = self._prepare_close(positions, symbol, signal)
+        matching, _ = self._prepare_close(positions, signal)
         sorted_pos = sorted(matching, key=lambda p: p.order)
         return self._apply_close(positions, sorted_pos, price, units_to_close)
 
@@ -315,7 +361,6 @@ class BusinessLogic:
         price: float,
         signal: int,
         units_to_close: int,
-        symbol: str = "",
         age_weight: float = 0.3,
         profit_weight: float = 0.7,
         age_dominance_threshold: float = 0.85,
@@ -332,7 +377,7 @@ class BusinessLogic:
                         jumps to bucket 0 and is sorted by age descending,
                         overriding profit entirely.
         """
-        matching, _ = self._prepare_close(positions, symbol, signal)
+        matching, _ = self._prepare_close(positions, signal)
         if not matching:
             return positions, 0.0
 
@@ -368,7 +413,6 @@ class BusinessLogic:
         price: float,
         signal: int,
         units_to_close: int,
-        symbol: str = "",
         risk_free_rate: float = 0.0,
     ) -> tuple[list[Position], float]:
         """
@@ -382,7 +426,7 @@ class BusinessLogic:
         Tiebreak: among equally safe positions, the least profitable closes
         first so the best winners keep running.
         """
-        matching, _ = self._prepare_close(positions, symbol, signal)
+        matching, _ = self._prepare_close(positions, signal)
 
         def risk_key(p):
             pnl = (price - p.price) * signal
@@ -402,7 +446,6 @@ class BusinessLogic:
         price: float,
         signal: int,
         units_to_close: int,
-        symbol: str = "",
     ) -> tuple[list[Position], float]:
         """
         Compares each position's proximity to its trailing stop against its
@@ -422,7 +465,7 @@ class BusinessLogic:
 
         Sorted descending by urgency → highest urgency closed first.
         """
-        matching, _ = self._prepare_close(positions, symbol, signal)
+        matching, _ = self._prepare_close(positions, signal)
         if not matching:
             return positions, 0.0
 
@@ -470,27 +513,26 @@ class BusinessLogic:
         positions: list[Position],
         action,
         regime: str,
-        symbol: str,
         strategy: CloseStrategy = "fifo",
         **strategy_kwargs,
     ) -> tuple[list[Position], float]:
         """
-        One method handles both opening and closing for `symbol`.
+        One method handles both opening and closing. Single instrument is
+        assumed, so every entry in `positions` belongs to it — no symbol
+        filtering anywhere in this method.
 
         Decision tree
         -------------
         1. Run determine_action → (final_action, volume_fraction).
            final_action  0  → hold, do nothing.
 
-        2. Check existing positions for this symbol.
+        2. OPEN  – triggered when:
+             a) No position exists at all, OR
+             b) All existing positions share the SAME direction as
+                final_action (pyramiding / adding to a winner).
 
-        3. OPEN  – triggered when:
-             a) No position exists for this symbol at all, OR
-             b) All existing positions for this symbol share the SAME direction
-                as final_action (pyramiding / adding to a winner).
-
-        4. CLOSE – triggered when the last position for this symbol has the
-           OPPOSITE direction to final_action (signal reversal).
+        3. CLOSE – triggered when the last position has the OPPOSITE
+           direction to final_action (signal reversal).
 
         Returns
         -------
@@ -502,17 +544,15 @@ class BusinessLogic:
         if final_action == 0:
             return positions, 0.0
 
-        symbol_positions = [p for p in positions if p.symbol == symbol]
-
-        if not symbol_positions:
+        if not positions:
             should_open  = True
             should_close = False
         else:
-            last_signal     = symbol_positions[-1].signal
-            same_direction  = all(p.signal == final_action for p in symbol_positions)
-            opposing        = last_signal != final_action
-            should_open     = same_direction
-            should_close    = opposing
+            last_signal    = positions[-1].signal
+            same_direction = all(p.signal == final_action for p in positions)
+            opposing       = last_signal != final_action
+            should_open    = same_direction
+            should_close   = opposing
 
         # ── OPEN ──────────────────────────────────────────────────────
         if should_open:
@@ -528,15 +568,15 @@ class BusinessLogic:
                 price=price,
                 volume=new_volume,
                 signal=final_action,
-                symbol=symbol,
             )
+            self._register_stop(new_position)
             return positions + [new_position], 0.0
 
         # ── CLOSE ─────────────────────────────────────────────────────
         if should_close:
-            close_signal = symbol_positions[-1].signal
+            close_signal = positions[-1].signal
             total_units  = sum(
-                p.volume for p in symbol_positions if p.signal == close_signal
+                p.volume for p in positions if p.signal == close_signal
             )
             units_to_close = volume_fraction * total_units
 
@@ -564,7 +604,6 @@ class BusinessLogic:
                 price,
                 close_signal,
                 units_to_close,
-                symbol=symbol,
                 **strategy_kwargs,
             )
 

@@ -316,9 +316,6 @@ class TradingEnv(gym.Env):
         Compare position lists to produce an opened/closed summary dict
         compatible with the original info["position_changes"] schema.
         """
-        before_ids = {id(p): p for p in before}
-        after_ids  = {id(p): p for p in after}
-
         # Opened: present in after but not before (new object -> new id)
         before_orders = {p.order for p in before}
         opened = []
@@ -431,6 +428,8 @@ class TradingEnv(gym.Env):
         self._prev_mark_price = {}
 
         # Bootstrap BusinessLogic; balance is the portfolio valuation tracked here.
+        # trail_pct is passed in so BusinessLogic._register_stop uses the same
+        # value as the environment was configured with.
         self.bl = BusinessLogic(
             df=self.df,
             balance=self.initial_balance,
@@ -451,10 +450,10 @@ class TradingEnv(gym.Env):
         regime = self._regime()
         obs = self.get_observation(regime)
         info = {
-            "portfolio_value":  self.initial_balance,
-            "position_changes": None,
-            "current_price":    self.df.iloc[0]["Open"],
-            "global_log_return": 0.0,
+            "portfolio_value":     self.initial_balance,
+            "position_changes":    None,
+            "current_price":       self.df.iloc[0]["Open"],
+            "global_log_return":   0.0,
             "closing_bonus_total": 0.0,
         }
         return obs, info
@@ -495,7 +494,9 @@ class TradingEnv(gym.Env):
         self._update_hurst()
         regime = self._regime()
 
-        # 3. Execute trade (manual/strategy close -> eligible for closing bonus)
+        # 3. Execute trade (manual/strategy close -> eligible for closing bonus).
+        # Skipped when trailing stops already fired this step to avoid acting
+        # on a position list that has just been materially changed.
         if trailing_pnl == 0.0:
             indicator_vector = action[:-1]
             indicator_list   = self.T_indicators if regime == "trending" else self.MR_indicators
@@ -514,7 +515,6 @@ class TradingEnv(gym.Env):
                     positions=self.positions,
                     action=action,
                     regime=regime,
-                    symbol=self._active_symbol(),
                     strategy=self.close_strategy,
                 )
 
@@ -538,7 +538,8 @@ class TradingEnv(gym.Env):
         terminated = self.current_step >= len(self.df) - 1
         truncated  = False
 
-        # 6. Force-close at episode end (no closing bonus - see class docstring)
+        # 6. Force-close at episode end (no closing bonus - see class docstring).
+        # force_close_all also clears price_peak / price_trough / heaps in bl.
         if terminated and self.positions:
             self.bl.current_step = self.current_step - 1
             before_fc = list(self.positions)
@@ -602,11 +603,3 @@ class TradingEnv(gym.Env):
     def _realised_pnl(self) -> float:
         """Accumulated realised PnL for all closed trades this episode."""
         return self._realised_pnl_acc
-
-    def _active_symbol(self) -> str:
-        """
-        Returns the symbol for the current episode.
-        Single-asset envs store it on `self.symbol`; fall back to "DEFAULT".
-        Override this method (or set `self.symbol`) for multi-asset use.
-        """
-        return getattr(self, "symbol", "DEFAULT")

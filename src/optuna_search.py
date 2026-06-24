@@ -6,7 +6,7 @@ Optuna-based hyperparameter optimisation for PPO × closing strategies.
 Two-stage pipeline
 -------------------
 Stage 1  –  40 k steps  –  up to N_TRIALS trials  (Optuna exploration / pruning)
-Stage 2  – 400 k steps  –  top-K configs from stage 1 (refinement)
+Stage 2  – 100 k steps  –  specific configs from stage 1 (refinement)
 
 Results are persisted after every trial:
   results/optuna/
@@ -75,8 +75,11 @@ for _d in (RESULTS_DIR, LOGS_DIR, BEST_DIR):
 #  Stage configs
 # ─────────────────────────────────────────────────────────────────────────────
 
-STAGE_STEPS = {1: 23_000, 2: 400_000}
+STAGE_STEPS = {1: 23_000, 2: 100_000}
 N_EVAL_EPISODES = 5
+
+# Stage 2: specific trial indexes to refine from stage 1 results
+STAGE2_TRIAL_INDEXES = [28, 4, 37, 32, 3]
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Indicator / strategy lists
@@ -617,12 +620,20 @@ def run_stage1(df: pd.DataFrame, n_trials: int = 60) -> pd.DataFrame:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Stage 2 – Refinement (400 k steps, top-K from stage 1)
+#  Stage 2 – Refinement (100 k steps, specific trial indexes from stage 1)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
+    """
+    Runs refinement on the specific trial indexes defined in STAGE2_TRIAL_INDEXES.
+    The `top_k` argument is accepted for CLI compatibility but not used here.
+    """
+    selected_indexes = STAGE2_TRIAL_INDEXES
+    n_configs = len(selected_indexes)
+
     print(f"\n{'='*80}")
-    print(f"STAGE 2  –  Refinement  ({STAGE_STEPS[2]:,} steps × top-{top_k} configs)")
+    print(f"STAGE 2  –  Refinement  ({STAGE_STEPS[2]:,} steps × {n_configs} configs)")
+    print(f"  Trial indexes: {selected_indexes}")
     print(f"{'='*80}\n")
 
     global _best_reward
@@ -635,8 +646,22 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
         )
 
     s1 = pd.read_csv(csv_path)
-    s1 = s1[s1["mean_reward"].notna()].sort_values("mean_reward", ascending=False)
-    top = s1.head(top_k)
+
+    # Select rows whose trial_id matches the requested indexes
+    selected = s1[s1["trial_id"].isin(selected_indexes)].copy()
+
+    missing = set(selected_indexes) - set(selected["trial_id"].tolist())
+    if missing:
+        raise ValueError(
+            f"The following trial indexes were not found in stage1_results.csv: {sorted(missing)}\n"
+            f"Available trial_ids: {sorted(s1['trial_id'].tolist())}"
+        )
+
+    # Preserve the order specified in STAGE2_TRIAL_INDEXES
+    selected["_sort_order"] = selected["trial_id"].map(
+        {tid: i for i, tid in enumerate(selected_indexes)}
+    )
+    selected = selected.sort_values("_sort_order").drop(columns="_sort_order")
 
     param_cols = [
         "learning_rate", "n_steps", "batch_size", "n_epochs",
@@ -649,15 +674,16 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
         print(f"[optuna] Resuming stage 2 — loaded {len(results)} previous result(s) from {os.path.join(RESULTS_DIR, 'stage2_results.csv')}")
 
     stage2_start = time.time()
-    for i, row in enumerate(top.itertuples(), 1):
+    for i, row in enumerate(selected.itertuples(), 1):
         params  = {c: getattr(row, c) for c in param_cols}
         elapsed = time.time() - stage2_start
         done    = i - 1
         avg_s   = elapsed / done if done else 0
-        eta_s   = avg_s * (top_k - done) if done else 0
+        eta_s   = avg_s * (n_configs - done) if done else 0
         print(
             f"\n{'='*80}\n"
-            f"  STAGE 2 — Config {i}/{top_k}"
+            f"  STAGE 2 — Config {i}/{n_configs}"
+            f"  |  stage1_trial_id={row.trial_id}"
             f"  |  stage1_reward={row.mean_reward:.4f}"
             f"  |  elapsed={elapsed:.0f}s"
             + (f"  |  avg/config={avg_s:.0f}s  ETA={eta_s:.0f}s" if done else "")
@@ -670,7 +696,7 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
             df=df,
             train_steps=STAGE_STEPS[2],
             stage=2,
-            trial_id=i,
+            trial_id=row.trial_id,   # preserve original stage-1 trial_id for traceability
             enable_pruning=False,
         )
         results = _merge_results(results, res)
@@ -718,7 +744,7 @@ if __name__ == "__main__":
         help="Which stage to run. 'both' runs 1→2 sequentially.",
     )
     parser.add_argument("--n-trials", type=int, default=60, help="Stage 1 trials.")
-    parser.add_argument("--top-k",    type=int, default=10, help="Stage 2: top-K configs from stage 1.")
+    parser.add_argument("--top-k",    type=int, default=10, help="Unused in stage 2 (indexes are hardcoded).")
     parser.add_argument(
         "--max-rows",
         type=int,
