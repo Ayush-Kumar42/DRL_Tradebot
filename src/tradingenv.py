@@ -81,6 +81,24 @@ class TradingEnv(gym.Env):
     All rolling statistics use only `df` rows `[0, current_step]` (inclusive)
     so normalization at any step is reproducible from data the agent could
     actually have seen up to that point.
+
+    Random-window evaluation
+    -------------------------
+    When `random_start=True`, each call to `reset()` selects a contiguous
+    slice of `window_size` rows starting at a uniformly-random offset within
+    the full dataset.  The full dataset is stored in `_full_df`; `self.df`
+    is replaced with the slice on every reset so all downstream code
+    (BusinessLogic, normalization, step indexing) operates identically to
+    a fixed-window run.  `random_start=False` (default) preserves the
+    original behaviour exactly.
+
+    Parameters
+    ----------
+    random_start : bool
+        If True, pick a random window each episode.  Default False.
+    window_size : int
+        Number of rows per episode when `random_start=True`.
+        Ignored when `random_start=False`.  Must be ≤ len(df).
     """
 
     # Per-feature normalization strategy. Anything in `continuous_features`
@@ -102,17 +120,35 @@ class TradingEnv(gym.Env):
         trail_pct: float = 0.05,
         norm_window: int = 200,
         norm_eps: float = 1e-8,
+        random_start: bool = False,
+        window_size: int = 5_000,
     ):
         super().__init__()
 
         # --- Data & feature config ---
-        self.df = df.reset_index(drop=True)
+        # _full_df always holds the complete dataset passed in at construction.
+        # self.df is the active slice used by this episode; when random_start
+        # is False it stays identical to _full_df across all episodes.
+        self._full_df = df.reset_index(drop=True)
+        self.df = self._full_df          # will be replaced in reset() if random_start
         self.T_indicators = T_indicators
         self.MR_indicators = MR_indicators
         self.continuous_features = continuous_features
         self.initial_balance = initial_balance
         self.close_strategy = close_strategy
         self.trail_pct = trail_pct
+
+        # --- Random-window config ---
+        self.random_start = random_start
+        self.window_size  = window_size
+        if random_start and window_size > len(self._full_df):
+            raise ValueError(
+                f"window_size={window_size} exceeds dataset length {len(self._full_df)}. "
+                f"Reduce window_size or pass a larger DataFrame."
+            )
+
+        # Internal RNG for window selection; seeded properly in reset().
+        self._window_rng = np.random.default_rng()
 
         # --- Normalization config ---
         # `norm_window` bars of trailing history are used to compute rolling
@@ -421,6 +457,22 @@ class TradingEnv(gym.Env):
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
 
+        # ── Random-window selection ───────────────────────────────────────
+        # When random_start is enabled, pick a contiguous slice of
+        # window_size rows at a uniformly-random offset within _full_df.
+        # Re-seed the internal RNG from the Gymnasium seed when one is
+        # supplied so that eval runs remain reproducible across calls.
+        if self.random_start:
+            if seed is not None:
+                self._window_rng = np.random.default_rng(seed)
+            max_start = len(self._full_df) - self.window_size
+            start     = int(self._window_rng.integers(0, max_start + 1))
+            self.df   = self._full_df.iloc[start : start + self.window_size].reset_index(drop=True)
+        else:
+            # Fixed mode: always use the full dataset, same as before.
+            self.df = self._full_df
+
+        # ── Standard reset logic (unchanged) ─────────────────────────────
         self.current_step = 0
         self.positions = []
         self._realised_pnl_acc = 0.0   # reset accumulator each episode

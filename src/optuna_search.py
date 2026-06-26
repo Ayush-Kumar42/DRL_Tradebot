@@ -3,19 +3,21 @@ optuna_search.py
 ----------------
 Optuna-based hyperparameter optimisation for PPO × closing strategies.
 
-Two-stage pipeline
--------------------
-Stage 1  –  40 k steps  –  up to N_TRIALS trials  (Optuna exploration / pruning)
+Three-stage pipeline
+---------------------
+Stage 1  –  23 k steps  –  up to N_TRIALS trials  (Optuna exploration / pruning)
 Stage 2  – 100 k steps  –  specific configs from stage 1 (refinement)
+Stage 3  – 200 k steps  –  positive performers from stage 2 (deep refinement,
+                            randomised-window evaluation)
 
 Results are persisted after every trial:
   results/optuna/
     study.db                  – Optuna SQLite journal (resume-safe)
     best_model/               – SB3 model checkpoint of all-time best
     best_metrics.json         – detailed metrics for that model
-    stage{1,2}_results.csv    – per-trial summaries per stage
+    stage{1,2,3}_results.csv  – per-trial summaries per stage
     logs/                     – per-trial log files
-    position_logs/            – per-run position-change CSVs (stage 2 only)
+    position_logs/            – per-run position-change CSVs (stages 2 & 3)
 
 Usage
 -----
@@ -25,8 +27,11 @@ Usage
     # Stage 2 (refinement, reads stage-1 results automatically)
     python optuna_search.py --stage 2 [--top-k 10]
 
-    # Run both stages sequentially
-    python optuna_search.py --stage both [--n-trials 60] [--top-k 10]
+    # Stage 3 (deep refinement, reads stage-2 results automatically)
+    python optuna_search.py --stage 3
+
+    # Run all stages sequentially
+    python optuna_search.py --stage all [--n-trials 60] [--top-k 10]
 
 Requirements
 ------------
@@ -78,11 +83,18 @@ for _d in (RESULTS_DIR, LOGS_DIR, BEST_DIR, POS_LOGS_DIR):
 #  Stage configs
 # ─────────────────────────────────────────────────────────────────────────────
 
-STAGE_STEPS = {1: 23_000, 2: 100_000}
+STAGE_STEPS = {1: 23_000, 2: 100_000, 3: 200_000}
 N_EVAL_EPISODES = 5
 
 # Stage 2: specific trial indexes to refine from stage 1 results
 STAGE2_TRIAL_INDEXES = [28, 4, 37, 32, 3]
+
+# Stage 3: number of eval episodes per checkpoint and window size for
+# randomised evaluation.  More episodes → tighter reward estimate across
+# diverse market regimes.
+N_EVAL_EPISODES_S3  = 15
+EVAL_WINDOW_SIZE_S3 = 5_000   # rows per randomised eval episode
+EVAL_FREQ_S3        = 20_000  # steps between evaluation checkpoints
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Indicator / strategy lists
@@ -146,20 +158,35 @@ def make_env(df: pd.DataFrame, strategy: str) -> Monitor:
     )
     return Monitor(env)
 
+
+def make_random_window_eval_env(df: pd.DataFrame, strategy: str) -> Monitor:
+    """
+    Eval env for stage 3: uses the full dataset but picks a fresh random
+    window of EVAL_WINDOW_SIZE_S3 rows on every reset().  Training env
+    (make_env) is unchanged — it always sees the full df.
+    """
+    env = TradingEnv(
+        df=df,
+        T_indicators=T_INDICATORS,
+        MR_indicators=MR_INDICATORS,
+        continuous_features=CONTINUOUS_FEATURES,
+        initial_balance=10_000.0,
+        close_strategy=strategy,
+        trail_pct=0.05,
+        random_start=True,
+        window_size=EVAL_WINDOW_SIZE_S3,
+    )
+    return Monitor(env)
+
 # ─────────────────────────────────────────────────────────────────────────────
-#  Position-change logger (stage 2 only)
+#  Position-change logger (stages 2 & 3)
 # ─────────────────────────────────────────────────────────────────────────────
 
-# CSV columns written for every position held at a change step.
-# One row per position per change event (multiple rows if several positions
-# are open when a change is detected).
 _POS_CSV_FIELDS = [
-    # When / context
     "step",
-    "action_0", "action_1", "action_2", "action_3", "action_4",   # indicator weights
-    "action_vol",                                                   # volume fraction
-    "change_type",   # "opened" | "closed" | "modified"
-    # Position attributes
+    "action_0", "action_1", "action_2", "action_3", "action_4",
+    "action_vol",
+    "change_type",
     "pos_order",
     "pos_price",
     "pos_volume",
@@ -169,39 +196,16 @@ _POS_CSV_FIELDS = [
 
 class PositionLogCallback(BaseCallback):
     """
-    Stage-2 callback that writes a CSV row for every open position
-    whenever the position list changes between two consecutive steps.
-
-    One file is created per training run, written to POS_LOGS_DIR:
-        position_logs/s2_t{trial_id:04d}_{strategy}.csv
-
-    Change detection
-    ----------------
-    After each env step we compare the current `env.positions` snapshot
-    against the snapshot from the previous step.  A change is detected when:
-      - the number of positions differs, OR
-      - any position's (order, volume) pair differs
-        (order handles opens/closes, volume handles partial closes)
-
-    On a change, we write one row per currently-open position, tagging the
-    event with a `change_type`:
-      "opened"   – net new position appeared (order not seen before)
-      "closed"   – a position that was open is now gone (or volume reduced)
-      "modified" – neither purely open nor purely close (e.g. simultaneous
-                   open+partial-close in one step)
-
-    The action that caused the change is written alongside each row so you
-    can correlate indicator weights with position changes.
+    Writes a CSV row for every open position whenever the position list
+    changes between two consecutive steps.  Used in stages 2 and 3.
     """
 
     def __init__(self, csv_path: str, verbose: int = 0):
         super().__init__(verbose)
         self._csv_path = csv_path
-        self._prev_positions: list[dict] | None = None  # snapshot of last step
+        self._prev_positions: list[dict] | None = None
         self._file = None
         self._writer = None
-
-    # ── Lifecycle ────────────────────────────────────────────────────────────
 
     def _on_training_start(self) -> None:
         self._file   = open(self._csv_path, "w", newline="", buffering=1)
@@ -215,11 +219,7 @@ class PositionLogCallback(BaseCallback):
             self._file   = None
             self._writer = None
 
-    # ── Per-step hook ────────────────────────────────────────────────────────
-
     def _on_step(self) -> bool:
-        # Unwrap Monitor → TradingEnv to read live position state.
-        # `self.training_env` is a VecEnv; index 0 is our single env.
         try:
             inner_env: TradingEnv = self.training_env.envs[0].unwrapped
         except (AttributeError, IndexError):
@@ -227,16 +227,11 @@ class PositionLogCallback(BaseCallback):
 
         current_step = getattr(inner_env, "current_step", None)
         positions    = getattr(inner_env, "positions", [])
-
-        # Build a lightweight snapshot: list of (order, volume) tuples
-        # sufficient to detect any change without holding Position refs.
         current_snapshot = [(p.order, p.volume) for p in positions]
 
         if self._prev_positions is not None and current_snapshot != self._prev_positions:
-            # Determine change type from the snapshots
             prev_orders    = {o for o, _ in self._prev_positions}
             current_orders = {p.order for p in positions}
-
             new_orders     = current_orders - prev_orders
             removed_orders = prev_orders    - current_orders
             prev_vol       = {o: v for o, v in self._prev_positions}
@@ -253,11 +248,9 @@ class PositionLogCallback(BaseCallback):
             else:
                 change_type = "modified"
 
-            # The action that produced this step's transition.
-            # self.locals["actions"] is shape (n_envs, action_dim) after _on_step.
             action = self.locals.get("actions")
             if action is not None:
-                action = action[0]   # single env → 1-D array
+                action = action[0]
             else:
                 action = []
 
@@ -271,20 +264,8 @@ class PositionLogCallback(BaseCallback):
         self._prev_positions = current_snapshot
         return True
 
-    # ── Writer ───────────────────────────────────────────────────────────────
-
-    def _write_rows(
-        self,
-        step: int,
-        positions: list,
-        action,
-        change_type: str,
-    ) -> None:
-        """Write one CSV row per currently-open position."""
-        # Unpack action into named slots; pad with None if shorter than expected.
+    def _write_rows(self, step, positions, action, change_type) -> None:
         act = list(action) if action is not None and len(action) else []
-        n_indicator_weights = len(_POS_CSV_FIELDS) - 1 - 2 - 4   # step, change_type, pos_*
-        # Simpler: just index directly by known layout (4 indicator weights + vol = 5)
         def _a(i):
             return round(float(act[i]), 6) if i < len(act) else None
 
@@ -296,7 +277,7 @@ class PositionLogCallback(BaseCallback):
                 "action_2":    _a(2),
                 "action_3":    _a(3),
                 "action_4":    _a(4),
-                "action_vol":  _a(4),   # volume fraction is last element
+                "action_vol":  _a(4),
                 "change_type": change_type,
                 "pos_order":   p.order,
                 "pos_price":   round(p.price,  6),
@@ -306,7 +287,7 @@ class PositionLogCallback(BaseCallback):
             self._writer.writerow(row)
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Metric-collecting callback (policy loss, value loss, entropy, approx KL)
+#  Metric-collecting callback
 # ─────────────────────────────────────────────────────────────────────────────
 
 class MetricsCallback(BaseCallback):
@@ -333,7 +314,6 @@ class MetricsCallback(BaseCallback):
         self.total_steps     = total_steps
         self.trial_label     = trial_label
 
-        # Accumulated metric lists
         self.policy_losses:  list[float] = []
         self.value_losses:   list[float] = []
         self.entropies:      list[float] = []
@@ -344,7 +324,6 @@ class MetricsCallback(BaseCallback):
         self._train_start    = time.time()
 
     def _on_step(self) -> bool:
-        # Intermediate eval for Optuna pruning
         if (
             self.trial is not None
             and self.eval_env is not None
@@ -363,7 +342,6 @@ class MetricsCallback(BaseCallback):
         return True
 
     def _on_rollout_end(self) -> None:
-        """Pull scalar metrics and print a live console summary."""
         logs = self.model.logger.name_to_value
         for key, store in [
             ("train/policy_gradient_loss", self.policy_losses),
@@ -412,6 +390,87 @@ class MetricsCallback(BaseCallback):
         }
 
 # ─────────────────────────────────────────────────────────────────────────────
+#  Stage-3 multi-window evaluation callback
+# ─────────────────────────────────────────────────────────────────────────────
+
+class RandomWindowEvalCallback(BaseCallback):
+    """
+    Periodic evaluation callback for stage 3.
+
+    Every `eval_freq` steps it runs `n_eval_episodes` full episodes on the
+    supplied eval env (which must be a random-window env so each episode
+    sees a different market segment).  Each episode is seeded from
+    `num_timesteps + episode_index` so windows are:
+      - varied     : different episodes within one checkpoint see different data
+      - reproducible: re-running the same checkpoint always picks the same windows
+      - non-repeating across checkpoints: the seed shifts with num_timesteps
+
+    Intermediate mean rewards are printed to console alongside the training
+    rollout summaries produced by MetricsCallback.  The full history of
+    checkpoint evaluations is stored in `eval_history` for post-run
+    analysis.
+    """
+
+    def __init__(
+        self,
+        eval_env,
+        eval_freq: int = EVAL_FREQ_S3,
+        n_eval_episodes: int = N_EVAL_EPISODES_S3,
+        trial_label: str = "",
+        verbose: int = 0,
+    ):
+        super().__init__(verbose)
+        self.eval_env        = eval_env
+        self.eval_freq       = eval_freq
+        self.n_eval_episodes = n_eval_episodes
+        self.trial_label     = trial_label
+        self._last_eval_step = 0
+        self.eval_history: list[dict] = []
+
+    def _on_step(self) -> bool:
+        if (self.num_timesteps - self._last_eval_step) >= self.eval_freq:
+            self._last_eval_step = self.num_timesteps
+            self._run_eval()
+        return True
+
+    def _run_eval(self) -> None:
+        rewards   = []
+        base_seed = self.num_timesteps  # shifts every checkpoint
+
+        for ep in range(self.n_eval_episodes):
+            obs, _ = self.eval_env.reset(seed=base_seed + ep)
+            done      = False
+            ep_reward = 0.0
+            while not done:
+                action, _ = self.model.predict(obs, deterministic=True)
+                obs, reward, terminated, truncated, _ = self.eval_env.step(action)
+                ep_reward += reward
+                done = terminated or truncated
+            rewards.append(ep_reward)
+
+        mean_r = float(np.mean(rewards))
+        std_r  = float(np.std(rewards))
+
+        self.eval_history.append({
+            "timestep":    self.num_timesteps,
+            "mean_reward": round(mean_r, 4),
+            "std_reward":  round(std_r,  4),
+            "n_episodes":  self.n_eval_episodes,
+        })
+
+        print(
+            f"  [{self.trial_label}] eval @ {self.num_timesteps:,} steps  "
+            f"reward={mean_r:.4f} ± {std_r:.4f}"
+            f"  ({self.n_eval_episodes} random windows)",
+            flush=True,
+        )
+
+    def best_mean_reward(self) -> float | None:
+        if not self.eval_history:
+            return None
+        return max(r["mean_reward"] for r in self.eval_history)
+
+# ─────────────────────────────────────────────────────────────────────────────
 #  Build PPO model from trial / fixed params
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -455,7 +514,6 @@ def build_model(
 
 
 def suggest_params(trial: optuna.Trial) -> dict[str, Any]:
-    """Ask Optuna to suggest a full hyperparameter set."""
     return {
         "learning_rate": trial.suggest_categorical(
             "learning_rate", [5e-5, 1e-4, 3e-4, 1e-3]
@@ -516,7 +574,6 @@ def maybe_save_best(
     stage: int,
     trial_id: int,
 ) -> bool:
-    """Save model + metrics if this is the best reward seen so far."""
     global _best_reward
     if mean_reward <= _best_reward:
         return False
@@ -540,7 +597,7 @@ def maybe_save_best(
     return True
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Single trial (used by Optuna objective)
+#  Single trial
 # ─────────────────────────────────────────────────────────────────────────────
 
 def run_trial(
@@ -552,14 +609,20 @@ def run_trial(
     trial_id: int,
     enable_pruning: bool = False,
     pos_log_path: str | None = None,
+    # Stage-3 specific: supply a random-window eval env to activate the
+    # richer multi-window evaluation path; None falls back to the standard path.
+    rw_eval_env=None,
 ) -> dict:
     """
     Train one PPO config and return a result dict with all metrics.
-    `trial` may be None when running fixed configs in stage 2.
 
-    If `pos_log_path` is provided, a PositionLogCallback is attached that
-    writes a CSV row for every open position whenever the position list
-    changes between consecutive steps.
+    When `rw_eval_env` is provided (stage 3), a RandomWindowEvalCallback
+    drives periodic evaluation over randomised data windows in addition to
+    the MetricsCallback rollout summaries.  The final reward reported is
+    the mean over N_EVAL_EPISODES_S3 random windows.
+
+    When `pos_log_path` is provided, a PositionLogCallback writes a CSV
+    for every position-list change during training.
     """
     strategy  = params["close_strategy"]
     run_name  = f"s{stage}_t{trial_id:04d}_{strategy}"
@@ -575,8 +638,8 @@ def run_trial(
         + (f"  [Optuna #{trial.number}]" if trial is not None else "")
     )
     print(f"  Strategy : {strategy}")
-    arch_str = params.get('net_arch', '?')
-    act_str  = params.get('activation_fn', '?')
+    arch_str = params.get("net_arch", "?")
+    act_str  = params.get("activation_fn", "?")
     print(
         f"  lr={params['learning_rate']}  gamma={params['gamma']}  "
         f"gae={params['gae_lambda']}  clip={params['clip_range']}  "
@@ -586,6 +649,11 @@ def run_trial(
     print(f"  Training for {train_steps:,} steps …")
     if pos_log_path:
         print(f"  Position log → {pos_log_path}")
+    if rw_eval_env is not None:
+        print(
+            f"  Eval: {N_EVAL_EPISODES_S3} random-window episodes "
+            f"(window={EVAL_WINDOW_SIZE_S3:,} rows)  every {EVAL_FREQ_S3:,} steps"
+        )
     print(_sep, flush=True)
 
     result: dict[str, Any] = {
@@ -600,14 +668,21 @@ def run_trial(
     }
 
     try:
-        env      = make_env(df, strategy)
+        env = make_env(df, strategy)
+
+        # Standard fixed-window eval env (used by MetricsCallback for
+        # rollout-level pruning in stage 1; unused in stage 3 where
+        # rw_eval_env takes over).
         eval_df  = df.tail(min(5000, len(df))).reset_index(drop=True)
         eval_env = make_env(eval_df, strategy)
 
         model = build_model(env, params)
 
-        trial_label = f"s{stage}/t{trial_id}" + (f"/{strategy}" if strategy else "")
-        # Stage 1: 1 eval episode per check (full df per episode, keep it fast)
+        trial_label = f"s{stage}/t{trial_id}/{strategy}"
+
+        # MetricsCallback: rollout summaries + optional Optuna pruning.
+        # In stage 3 we don't use it for pruning (no trial object), but
+        # we keep it for the console rollout-level summaries.
         _eval_eps = 1 if stage == 1 else 3
         metrics_cb = MetricsCallback(
             trial=trial if enable_pruning else None,
@@ -618,8 +693,20 @@ def run_trial(
             trial_label=trial_label,
         )
 
-        # Build callback list: always include metrics; add position logger for stage 2
         callbacks = [metrics_cb]
+
+        # Stage 3: add the random-window eval callback
+        rw_eval_cb: RandomWindowEvalCallback | None = None
+        if rw_eval_env is not None:
+            rw_eval_cb = RandomWindowEvalCallback(
+                eval_env=rw_eval_env,
+                eval_freq=EVAL_FREQ_S3,
+                n_eval_episodes=N_EVAL_EPISODES_S3,
+                trial_label=trial_label,
+            )
+            callbacks.append(rw_eval_cb)
+
+        # Position logger (stages 2 & 3)
         if pos_log_path is not None:
             callbacks.append(PositionLogCallback(csv_path=pos_log_path))
 
@@ -627,24 +714,56 @@ def run_trial(
         model.learn(
             total_timesteps=train_steps,
             callback=callbacks,
-            progress_bar=False,  # we print our own rollout summaries
+            progress_bar=False,
             reset_num_timesteps=True,
         )
         result["train_time_s"] = round(time.time() - t0, 2)
 
-        # Stage 1: single episode eval to keep it fast (full df per episode)
-        _n_eval = 1 if stage == 1 else N_EVAL_EPISODES
-        print(f"  Evaluating ({_n_eval} episode{'s' if _n_eval > 1 else ''}) …", flush=True)
-        mean_r, std_r = evaluate_policy(
-            model, eval_env,
-            n_eval_episodes=_n_eval,
-            deterministic=True,
-            warn=False,
-        )
-        result["mean_reward"] = round(float(mean_r), 4)
-        result["std_reward"]  = round(float(std_r),  4)
+        # ── Final evaluation ─────────────────────────────────────────────
+        if rw_eval_cb is not None:
+            # Stage 3: one final multi-window eval pass after training
+            # completes (same mechanism as the periodic checkpoints).
+            print(
+                f"  Final eval ({N_EVAL_EPISODES_S3} random-window episodes) …",
+                flush=True,
+            )
+            rewards   = []
+            base_seed = train_steps  # distinct from any checkpoint seed
+            for ep in range(N_EVAL_EPISODES_S3):
+                obs, _ = rw_eval_env.reset(seed=base_seed + ep)
+                done      = False
+                ep_reward = 0.0
+                while not done:
+                    action, _ = model.predict(obs, deterministic=True)
+                    obs, reward, terminated, truncated, _ = rw_eval_env.step(action)
+                    ep_reward += reward
+                    done = terminated or truncated
+                rewards.append(ep_reward)
+            mean_r = float(np.mean(rewards))
+            std_r  = float(np.std(rewards))
 
-        # Collect training metric summaries
+            # Also store the full checkpoint history in the result for
+            # post-run analysis (JSON-serialisable list of dicts).
+            result["eval_history"] = rw_eval_cb.eval_history
+        else:
+            # Stages 1 & 2: standard evaluate_policy on the fixed tail slice
+            _n_eval = 1 if stage == 1 else N_EVAL_EPISODES
+            print(
+                f"  Evaluating ({_n_eval} episode{'s' if _n_eval > 1 else ''}) …",
+                flush=True,
+            )
+            mean_r, std_r = evaluate_policy(
+                model, eval_env,
+                n_eval_episodes=_n_eval,
+                deterministic=True,
+                warn=False,
+            )
+            mean_r = float(mean_r)
+            std_r  = float(std_r)
+
+        result["mean_reward"] = round(mean_r, 4)
+        result["std_reward"]  = round(std_r,  4)
+
         metric_summary = metrics_cb.summary()
         result.update(metric_summary)
 
@@ -655,24 +774,22 @@ def run_trial(
         )
         logger.info(f"Training metrics: {metric_summary}")
 
-        elapsed_total = result["train_time_s"]
         print(
             f"  ✓ done  reward={result['mean_reward']:.4f} ± {result['std_reward']:.4f}"
             f"  |  pol={metric_summary.get('final_policy_loss')}"
             f"  val={metric_summary.get('final_value_loss')}"
             f"  ent={metric_summary.get('final_entropy')}"
-            f"  |  {elapsed_total}s total",
+            f"  |  {result['train_time_s']}s total",
             flush=True,
         )
 
-        # Save if best
-        maybe_save_best(model, float(mean_r), metric_summary, params, stage, trial_id)
+        maybe_save_best(model, mean_r, metric_summary, params, stage, trial_id)
 
     except optuna.exceptions.TrialPruned:
         result["error"] = "PRUNED"
         logger.info("Trial pruned by Optuna")
         print("  ✗ PRUNED by Optuna (underperforming at intermediate check)", flush=True)
-        raise  # re-raise so Optuna records it correctly
+        raise
 
     except Exception as e:
         tb  = traceback.format_exc()
@@ -682,15 +799,8 @@ def run_trial(
 
     return result
 
-def _load_existing_results(stage: int) -> list[dict]:
-    """
-    Load any previously-saved results for this stage from disk, so that
-    resuming a run (e.g. after a crash, or because the Optuna study already
-    has completed trials) doesn't wipe out prior CSV rows.
 
-    Returns a list of row-dicts (NaN converted to None) ordered by trial_id.
-    Returns an empty list if no CSV exists yet.
-    """
+def _load_existing_results(stage: int) -> list[dict]:
     csv_path = os.path.join(RESULTS_DIR, f"stage{stage}_results.csv")
     if not os.path.exists(csv_path):
         return []
@@ -698,32 +808,21 @@ def _load_existing_results(stage: int) -> list[dict]:
         df_existing = pd.read_csv(csv_path)
     except pd.errors.EmptyDataError:
         return []
-
-    # Convert NaN -> None so JSON/CSV round-tripping behaves like the
-    # in-memory dicts produced by run_trial() (which use None for missing).
     df_existing = df_existing.where(pd.notnull(df_existing), None)
     return df_existing.to_dict(orient="records")
 
 
 def _merge_results(existing: list[dict], new_row: dict) -> list[dict]:
-    """
-    Insert/replace `new_row` into `existing` keyed by trial_id, preserving
-    order (existing rows keep their position, new trial_ids are appended).
-    """
     by_id = {r["trial_id"]: r for r in existing}
     by_id[new_row["trial_id"]] = new_row
-
-    # Preserve original order, then append any genuinely new ids at the end
     ordered_ids = [r["trial_id"] for r in existing]
     for tid in by_id:
         if tid not in ordered_ids:
             ordered_ids.append(tid)
     return [by_id[tid] for tid in ordered_ids]
 
-
-
 # ─────────────────────────────────────────────────────────────────────────────
-#  Stage 1 – Optuna exploration (40 k steps)
+#  Stage 1 – Optuna exploration
 # ─────────────────────────────────────────────────────────────────────────────
 
 def run_stage1(df: pd.DataFrame, n_trials: int = 60) -> pd.DataFrame:
@@ -745,7 +844,7 @@ def run_stage1(df: pd.DataFrame, n_trials: int = 60) -> pd.DataFrame:
 
     results: list[dict] = _load_existing_results(stage=1)
     if results:
-        print(f"[optuna] Resuming stage 1 — loaded {len(results)} previous result(s) from {os.path.join(RESULTS_DIR, 'stage1_results.csv')}")
+        print(f"[optuna] Resuming stage 1 — loaded {len(results)} previous result(s)")
 
     stage1_start = time.time()
 
@@ -776,7 +875,6 @@ def run_stage1(df: pd.DataFrame, n_trials: int = 60) -> pd.DataFrame:
             stage=1,
             trial_id=trial.number,
             enable_pruning=True,
-            # No position logging in stage 1
         )
         nonlocal results
         results = _merge_results(results, res)
@@ -793,18 +891,13 @@ def run_stage1(df: pd.DataFrame, n_trials: int = 60) -> pd.DataFrame:
     _print_top(df_results, n=10, stage=1)
     return df_results
 
-
 # ─────────────────────────────────────────────────────────────────────────────
-#  Stage 2 – Refinement (100 k steps, specific trial indexes from stage 1)
+#  Stage 2 – Refinement
 # ─────────────────────────────────────────────────────────────────────────────
 
 def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
     """
     Runs refinement on the specific trial indexes defined in STAGE2_TRIAL_INDEXES.
-    The `top_k` argument is accepted for CLI compatibility but not used here.
-
-    Each of the five training runs writes its own position-change CSV to:
-        results/optuna/position_logs/s2_t{trial_id:04d}_{strategy}.csv
     """
     selected_indexes = STAGE2_TRIAL_INDEXES
     n_configs = len(selected_indexes)
@@ -825,18 +918,15 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
         )
 
     s1 = pd.read_csv(csv_path)
-
-    # Select rows whose trial_id matches the requested indexes
     selected = s1[s1["trial_id"].isin(selected_indexes)].copy()
 
     missing = set(selected_indexes) - set(selected["trial_id"].tolist())
     if missing:
         raise ValueError(
-            f"The following trial indexes were not found in stage1_results.csv: {sorted(missing)}\n"
+            f"Trial indexes not found in stage1_results.csv: {sorted(missing)}\n"
             f"Available trial_ids: {sorted(s1['trial_id'].tolist())}"
         )
 
-    # Preserve the order specified in STAGE2_TRIAL_INDEXES
     selected["_sort_order"] = selected["trial_id"].map(
         {tid: i for i, tid in enumerate(selected_indexes)}
     )
@@ -850,10 +940,20 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
 
     results: list[dict] = _load_existing_results(stage=2)
     if results:
-        print(f"[optuna] Resuming stage 2 — loaded {len(results)} previous result(s) from {os.path.join(RESULTS_DIR, 'stage2_results.csv')}")
+        print(f"[optuna] Resuming stage 2 — loaded {len(results)} previous result(s)")
+
+    completed_ids = {r["trial_id"] for r in results if r.get("mean_reward") is not None}
 
     stage2_start = time.time()
     for i, row in enumerate(selected.itertuples(), 1):
+        if row.trial_id in completed_ids:
+            print(
+                f"\n  STAGE 2 — Config {i}/{n_configs}"
+                f"  |  stage1_trial_id={row.trial_id}  [already completed, skipping]",
+                flush=True,
+            )
+            continue
+
         params   = {c: getattr(row, c) for c in param_cols}
         strategy = params["close_strategy"]
         elapsed  = time.time() - stage2_start
@@ -871,11 +971,8 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
             flush=True,
         )
 
-        # One position-log CSV per training run, named by trial_id + strategy
-        # so files are self-documenting and never collide across runs.
         pos_log_path = os.path.join(
-            POS_LOGS_DIR,
-            f"s2_t{row.trial_id:04d}_{strategy}.csv",
+            POS_LOGS_DIR, f"s2_t{row.trial_id:04d}_{strategy}.csv"
         )
 
         res = run_trial(
@@ -884,7 +981,7 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
             df=df,
             train_steps=STAGE_STEPS[2],
             stage=2,
-            trial_id=row.trial_id,   # preserve original stage-1 trial_id for traceability
+            trial_id=row.trial_id,
             enable_pruning=False,
             pos_log_path=pos_log_path,
         )
@@ -895,6 +992,150 @@ def run_stage2(df: pd.DataFrame, top_k: int = 10) -> pd.DataFrame:
     _print_top(df_results, n=5, stage=2)
     return df_results
 
+# ─────────────────────────────────────────────────────────────────────────────
+#  Stage 3 – Deep refinement (positive stage-2 performers only)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def run_stage3(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Re-trains only the stage-2 configs whose mean_reward > 0, using:
+      - 200 k training steps (double stage 2)
+      - 15 evaluation episodes per checkpoint, each on a fresh random
+        5 000-row window drawn from the full dataset
+      - Periodic checkpoints every 20 k steps so you can watch
+        generalisation improve (or diverge) over time
+      - Position-change CSVs (same format as stage 2)
+      - Resume/skip logic: already-completed trial_ids are skipped
+
+    Outputs
+    -------
+    results/optuna/
+        stage3_results.csv              – per-trial summary
+        position_logs/s3_t*_*.csv       – position-change logs
+        logs/s3_t*_*.log                – per-trial log files
+        best_model/                     – updated if a new all-time best is set
+    """
+    stage = 3
+
+    # ── Load stage 2, keep only positive performers ───────────────────────
+    s2_csv = os.path.join(RESULTS_DIR, "stage2_results.csv")
+    if not os.path.exists(s2_csv):
+        raise FileNotFoundError(
+            f"Stage 2 results not found at {s2_csv}. Run stage 2 first."
+        )
+
+    s2       = pd.read_csv(s2_csv)
+    positive = s2[s2["mean_reward"] > 0].copy()
+
+    if positive.empty:
+        print(
+            "[stage 3] No positive performers found in stage2_results.csv. "
+            "Nothing to do."
+        )
+        return positive
+
+    # Sort descending so the most promising config runs first.
+    positive = positive.sort_values("mean_reward", ascending=False).reset_index(drop=True)
+    n_configs = len(positive)
+
+    print(f"\n{'='*80}")
+    print(
+        f"STAGE 3  –  Deep refinement  "
+        f"({STAGE_STEPS[3]:,} steps × {n_configs} config{'s' if n_configs != 1 else ''})"
+    )
+    print(f"  Positive stage-2 performers (mean_reward > 0):")
+    for _, r in positive.iterrows():
+        print(
+            f"    trial_id={int(r['trial_id'])}  "
+            f"reward={r['mean_reward']:.4f}  "
+            f"strategy={r['close_strategy']}"
+        )
+    print(
+        f"  Eval: {N_EVAL_EPISODES_S3} random-window episodes "
+        f"(window={EVAL_WINDOW_SIZE_S3:,} rows)  every {EVAL_FREQ_S3:,} steps"
+    )
+    print(f"  Position logs → {POS_LOGS_DIR}/")
+    print(f"{'='*80}\n")
+
+    global _best_reward
+    _best_reward = _load_best_reward()
+
+    param_cols = [
+        "learning_rate", "n_steps", "batch_size", "n_epochs",
+        "gamma", "gae_lambda", "clip_range", "ent_coef", "vf_coef",
+        "max_grad_norm", "net_arch", "activation_fn", "close_strategy",
+    ]
+
+    results: list[dict] = _load_existing_results(stage=stage)
+    if results:
+        print(
+            f"[optuna] Resuming stage 3 — loaded {len(results)} previous result(s) "
+            f"from {os.path.join(RESULTS_DIR, 'stage3_results.csv')}"
+        )
+
+    # trial_ids whose result row already has a valid reward → skip them
+    completed_ids = {
+        r["trial_id"] for r in results if r.get("mean_reward") is not None
+    }
+
+    stage3_start = time.time()
+
+    for i, row in enumerate(positive.itertuples(), 1):
+        trial_id = int(row.trial_id)
+        strategy = row.close_strategy
+
+        if trial_id in completed_ids:
+            print(
+                f"\n  STAGE 3 — Config {i}/{n_configs}"
+                f"  |  trial_id={trial_id}  [already completed, skipping]",
+                flush=True,
+            )
+            continue
+
+        params  = {c: getattr(row, c) for c in param_cols}
+        elapsed = time.time() - stage3_start
+        done    = i - 1
+        avg_s   = elapsed / done if done else 0
+        eta_s   = avg_s * (n_configs - done) if done else 0
+
+        print(
+            f"\n{'='*80}\n"
+            f"  STAGE 3 — Config {i}/{n_configs}"
+            f"  |  stage2_trial_id={trial_id}"
+            f"  |  stage2_reward={row.mean_reward:.4f}"
+            f"  |  strategy={strategy}"
+            f"  |  elapsed={elapsed:.0f}s"
+            + (f"  |  avg/config={avg_s:.0f}s  ETA={eta_s:.0f}s" if done else "")
+            + f"\n{'='*80}",
+            flush=True,
+        )
+
+        # Random-window eval env: full df passed in; TradingEnv picks a
+        # fresh random slice of EVAL_WINDOW_SIZE_S3 rows each reset().
+        rw_eval_env = make_random_window_eval_env(df, strategy)
+
+        pos_log_path = os.path.join(
+            POS_LOGS_DIR, f"s3_t{trial_id:04d}_{strategy}.csv"
+        )
+
+        res = run_trial(
+            trial=None,
+            params=params,
+            df=df,
+            train_steps=STAGE_STEPS[3],
+            stage=stage,
+            trial_id=trial_id,
+            enable_pruning=False,
+            pos_log_path=pos_log_path,
+            rw_eval_env=rw_eval_env,
+        )
+
+        results = _merge_results(results, res)
+        _save_stage_results(results, stage=stage)
+
+    df_results = _save_stage_results(results, stage=stage)
+    _print_top(df_results, n=n_configs, stage=stage)
+    return df_results
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Persistence helpers
@@ -928,9 +1169,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--stage",
         type=str,
-        choices=["1", "2", "both"],
+        choices=["1", "2", "3", "both", "all"],
         default="1",
-        help="Which stage to run. 'both' runs 1→2 sequentially.",
+        help=(
+            "Which stage to run. "
+            "'both' runs 1→2, 'all' runs 1→2→3 sequentially."
+        ),
     )
     parser.add_argument("--n-trials", type=int, default=60, help="Stage 1 trials.")
     parser.add_argument("--top-k",    type=int, default=10, help="Unused in stage 2 (indexes are hardcoded).")
@@ -944,7 +1188,9 @@ if __name__ == "__main__":
 
     df = load_data(max_rows=args.max_rows if args.max_rows > 0 else None)
 
-    if args.stage in ("1", "both"):
+    if args.stage in ("1", "both", "all"):
         run_stage1(df, n_trials=args.n_trials)
-    if args.stage in ("2", "both"):
+    if args.stage in ("2", "both", "all"):
         run_stage2(df, top_k=args.top_k)
+    if args.stage in ("3", "all"):
+        run_stage3(df)
